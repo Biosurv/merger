@@ -14,7 +14,9 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, Q
 
 # DESCRIPTION
 """
-
+The Merger app takes three files, output csv file for Piranha analysis pipeline, a lab info csv file containing required laboratory info, and an epi info csv file that was
+pulled from the EpiInfo database of the PolioLab. The User inputs a run number and clicks the Merge button and the output will be published in the Downloads folder. The app has
+three built in languages: English, French, and Portuguese. The app also has a feature to generate template files for labinfo that should be filled in by the user.
 """
 
 # COMPILE COMMANDS
@@ -22,7 +24,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, Q
 CLI MAC OS
 python3.11 -m nuitka --macos-app-icon=Icon.icns --include-data-files=Logo.png=Logo.png
 --include-data-files=Icon.ico=Icon.icns --macos-app-mode=gui --disable-console --macos-create-app-bundle
---macos-app-name="CSV Merger App" --onefile --enable-plugin=pyqt5 Merger_2.0.1.py
+--macos-app-name="CSV Merger App" --onefile --enable-plugin=pyqt5 Merger_2.0.2.py
 
 WIN - CommandPrompt
 nuitka --onefile --enable-plugins=pyqt5 --include-data-files=Logo.png=./Logo.png --include-data-files=Icon.ico=./Icon.ico --disable-console 
