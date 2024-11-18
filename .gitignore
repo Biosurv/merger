@@ -1,0 +1,6 @@
+/CameroonDB
+/*.build
+/*.dist
+/*.onefile-build
+*.exe
+template_generator.py
