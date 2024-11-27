@@ -1,0 +1,380 @@
+import { Button, VerticalBox, LineEdit, StandardTableView, HorizontalBox, CheckBox, ComboBox } from "std-widgets.slint";
+
+export component GridLineEdit {
+    in property <string> label;
+    in property <string> yyyymmdd: "";
+    in-out property <string> text;
+    in property <length> box_length : 160px;
+
+    HorizontalLayout {
+        spacing: 10px;
+        Text {text: label;vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px;}
+        LineEdit{text <=> root.text ; height: 25px; width: root.box_length; horizontal-alignment: left; placeholder-text: root.yyyymmdd;}
+    }
+}
+
+export component ErrorBox {
+    in property<string> title;
+    in property<string> message;
+    in-out property<float> state;
+
+    Rectangle {
+        width: 600px;
+        height: 300px;
+        border-radius: 10px;
+        background: white;
+        border-width: 1px;
+        border-color:#000000;
+        padding: 10px;
+        z: 1000;
+        opacity: root.state;
+
+        Rectangle {
+            border-color: black;
+            border-width: 1px;
+            border-radius: 0px;
+            background: #f8d7da;
+            width: 600px;
+            height: 35px;
+            y: 0px;
+
+        Text {
+            text: title;
+            font-size: 16px;
+            color: black;
+            horizontal-alignment: center;
+            y: 10px;
+        }}
+
+        Text {
+            text: message;
+            font-size: 14px;
+            color: #721c24;
+            wrap: word-wrap;
+            width: 580px;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            y: 50px;
+        }
+
+        Button {
+            text: "Close";
+            width: 80px;
+            height: 30px;
+            y: 260px;
+            clicked => { root.state = 0.0; }
+        }
+    }
+}
+
+export component InfoBox {
+    in property<string> title;
+    in property<string> message;
+    in-out property<float> state;
+
+    Rectangle {
+        width: 300px;
+        height: 130px;
+        border-radius: 10px;
+        background: white;
+        border-width: 1px;
+        border-color:#000000;
+        padding: 10px;
+        z: 1000;
+        opacity: root.state;
+
+        Rectangle {
+            border-color: black;
+            border-width: 1px;
+            border-radius: 0px;
+            background: #cabcbc;
+            width: 300px;
+            height: 35px;
+            y: 0px;
+
+        Text {
+            text: title;
+            font-size: 16px;
+            color: black;
+            horizontal-alignment: center;
+            y: 10px;
+        }}
+
+        Text {
+            text: message;
+            font-size: 14px;
+            color: #000000;
+            wrap: word-wrap;
+            width: 280px;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            y: 50px;
+        }
+
+        Button {
+            text: "Close";
+            width: 80px;
+            height: 30px;
+            y: 95px;
+            clicked => { root.state = 0.0; }
+        }
+    }
+}
+
+export component Guide {
+    in-out property <float> state;
+    Rectangle {
+        y: -190px;
+        width: 1260px; height: 380px;
+        border-radius: 10px;
+        background: #f7ae6c;
+        border-width: 1px;
+        border-color:#000000;
+        padding: 10px;
+        z: 1000;
+        opacity: root.state;
+
+        Rectangle {width: 1260px; height: 1px; border-color: black; border-width: 1px; y: 240px;}
+
+
+        GridLayout {
+            spacing: 16px; padding: 5px;
+            Text {text: "Laboratory";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 0;}
+            Text {text: "Organisation or institute that performed the run.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 0;}
+
+            Text {text: "Run Number";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 1;}
+            Text {text: "Unique number with format: YYYYMMDD_XXX. Where YYYYMMDD is run date and XXX is the incremental run number of the year, e.g. 012."; vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 1;}
+
+            Text {text: "Piranha Version";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 2;}
+            Text {text: "Version number can be found on the first page of the app when launched. Please keep Piranha up to date. Example: 1.3.1";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 2;}
+
+
+            Text {text: "MinKNOW Version";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 3;}
+            Text {text: "Basecalling sofwtare version from Oxford Nanopore. Can be found in Host settings on the first page. Example: 24.06.16";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 3;}
+
+            Text {text: "Date RT";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 4;}
+            Text {text: "Date RT-PCR was performed. Please use YYYY-MM-DD format. Example: 2024-11-14";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 4;}
+
+            Text {text: "Date VP1";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 0;}
+            Text {text: "Date VP1 PCR was performed. Please use YYYY-MM-DD format.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 0;}
+
+            Text {text: "PCR Machine";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 1;}
+            Text {text: "Brand and model of PCR used for both PCRs.   Example: Biorad CFX";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 1;}
+
+            Text {text: "Date Sequenced";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 2;}
+            Text {text: "Date Nanopore sequencing was started. Please use YYYY-MM-DD format.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 2;}
+
+            Text {text: "Library Kit";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 3;}
+            Text {text: "ONT Library Preparation Kit Used for sequencing run. Example: SQK-LSK114";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 3;}
+
+
+            Text {text: "Run Hours";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 4;}
+            Text {text: "Sequencing Run Hours, just type the number of hours, Example: 4";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 4;}
+
+            Text {text: "Date FASTA Created";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 4; row: 0;}
+            Text {text: "Date MinKNOW Basecalling was finished. Please use YYYY-MM-DD format";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 5; row: 0;}
+
+            Text {text: "FlowCell ID";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 4; row: 1;}
+            Text {text: "ONT FlowCell Unique ID, can be found on the packaging or on the cell itself. Example: FAX1000";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 5; row: 1;}
+
+            Text {text: "FlowCell Pores";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 4; row: 2;}
+            Text {text: "FlowCell Pores found after FlowCell check was performed. Example: 1200";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 5; row: 2;}
+
+            Text {text: "FlowCell Prior Uses";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 4; row: 3;}
+            Text {text: "FlowCell prior uses, if it is a new cell, put 0. if the cell has been used before put 1. Example: 1";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 5; row: 3;}
+            
+            
+            Text {text: "Merge Button:";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 5;}
+            Text {text: "This will join both samples and EpiInfo information and add Run Information to the output detailed run report in  the destination.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 5;}
+
+            Text {text: "Update Button:";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 5;}
+            Text {text: "This will update the EpiInfo of a detailed run report with the supplied epiinfo. User doesn't need to fill in run information again.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 5;}
+
+            Text {text: "Clear Button:";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 4; row: 5;}
+            Text {text: "This will clear all inputed information.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 5; row: 5;}
+
+            Text {text: "Template Button:";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 0; row: 6;}
+            Text {text: "This will save a template of the sample file in the downloads folder.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 1; row: 6;}
+
+            Text {text: "Guide Button:";vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px; col: 2; row: 6;}
+            Text {text: "This will display this guide.";vertical-alignment: center;horizontal-alignment: left;font-size: 11px; font-weight: 500;width: 260px; wrap: word-wrap; col: 3; row: 6;}
+            
+            Button {
+                text: "Close";
+                width: 80px;
+                height: 30px;
+                row: 7;
+                col: 3;
+                colspan: 5;
+
+                enabled: root.state != 0.0; 
+                
+                clicked => { root.state = 0.0; }
+            }
+        }
+    }
+    
+}
+
+
+export component AppWindow inherits Window {
+    width: 1270px;
+    height: 390px;
+    
+    // PROPERTIES
+    // file paths
+    in-out property <string> sample_file; 
+    in-out property <string> epiinfo_file;
+    in-out property <string> destination;
+
+    // gen info
+    in-out property <string> lab;
+    in-out property <string> run_num;
+    in-out property <string> pir_ver;
+    in-out property <string> mink_ver;
+
+    // controls
+    in-out property <bool> pos_con <=> pos-box.checked;
+    in-out property <bool> neg_con <=> neg-box.checked;
+
+    // pcr info
+    in-out property <string> rt_date;
+    in-out property <string> pcr_machine;
+    in-out property <string> vp1_date;
+
+    // seq info
+    in-out property <string> seq_date;
+    in-out property <string> seq_kit;
+    in-out property <string> seq_hours;
+    in-out property <string> fc_id;
+    in-out property <string> fc_pores;
+    in-out property <string> fc_uses;
+    in-out property <string> fasta_date;
+
+    // error message
+    in-out property<float> show_error:0.0;
+    in-out property<string> error_title:"";
+    in-out property<string> error_message:"";
+
+    // error message
+    in-out property<float> show_info:0.0;
+    in-out property<string> info_title:"";
+    in-out property<string> info_message:"";
+
+    // guide
+    in-out property <float> show_guide:0.0;
+
+    // CALLBACKS
+    callback select_file(string);
+    callback merge(string); // rename to create
+    callback clear();
+    callback update();
+    callback template();
+
+    // Rectangle {background:@linear-gradient(180deg, #fce0b0 0%, #f7ae6c 50%, #ed6d37 75%, #e73c25 100%);
+    //     border-color: black; border-radius: 10px; border-width: 1px; padding: 8px;
+
+    // gradient background
+    Rectangle {background: @linear-gradient(180deg, #fce0b0 0%, #f7ae6c 50%, #ed6d37 75%, #e73c25 100%);
+    border-color: black;border-width: 2px;
+    }
+
+    // APP LAYOUT
+    GridLayout {
+        spacing: 7px; padding: 15px;
+
+        // row 0 title and logo
+        Text {text: "Merger"; font-size: 30px;
+        horizontal-alignment: center; vertical-alignment: center; row: 0; col: 1; colspan: 2;}
+        Image {
+        source: @image-url("psc_logo.png");
+        height: 15%; width: 15%;
+        horizontal-alignment: left; vertical-alignment: top;
+        row: 0; col: 0;
+        }
+
+        // col 0
+        Rectangle {row: 1; col: 0; border-color: black; border-width: 2px;}
+        Text {text: "GENERAL INFO"; row: 1; col: 0; font-weight: 500;
+            height: 5%; horizontal-alignment: center; vertical-alignment: center;}
+        GridLineEdit {label: "Laboratory"; text <=> root.lab; row: 2;col: 0;}
+        GridLineEdit {label: "Run Number"; text <=> root.run_num; yyyymmdd: "YYYYMMDD_XXX";row: 3;col: 0;}
+        GridLineEdit {label: "Piranha Version"; text <=> root.pir_ver; row: 4;col: 0;}
+        GridLineEdit {label: "MinKNOW Version";text <=> root.mink_ver; row: 5;col: 0;}
+
+        // col 1
+        Rectangle {row: 1; col: 1; border-color: black; border-width: 2px;}
+        Text {text: "PCR INFO"; row: 1; col: 1; height: 5%; font-weight: 500;
+         horizontal-alignment: center; vertical-alignment: center;}
+        GridLineEdit {label: "Date RT"; text <=> root.rt_date; yyyymmdd: "YYYY-MM-DD"; row: 2;col: 1;}
+        GridLineEdit {label: "Date VP1"; text <=> root.vp1_date; yyyymmdd: "YYYY-MM-DD"; row: 3;col: 1;}
+        GridLineEdit {label: "PCR Machine"; text <=> root.pcr_machine; row: 4;col: 1;}
+        HorizontalLayout { row: 5;col: 1;
+        pos_box:= CheckBox {text: "Positive Control";} // Control Check
+        neg_box:= CheckBox {text: "Negative Control";}
+        }
+
+        // col 2
+        Rectangle {row: 1; col: 2; colspan: 2; border-color: black; border-width: 2px;}
+        Text {text: "SEQUENCING INFO"; row: 1; col: 2; colspan: 2; height: 5%; font-weight: 500;
+              horizontal-alignment: center; vertical-alignment: center;}
+        GridLineEdit {label: "Date Sequenced"; text <=> root.seq_date; yyyymmdd: "YYYY-MM-DD"; row: 2;col: 2;}
+        GridLineEdit {label: "Library Kit"; text <=> root.seq_kit; row: 3;col: 2;}
+        GridLineEdit {label: "Run Hours"; text <=> root.seq_hours; row: 4;col: 2;}
+        GridLineEdit {label: "Date Fasta Created";text <=> root.fasta_date; yyyymmdd: "YYYY-MM-DD"; row: 5;col: 2;}
+
+        // col 3
+        GridLineEdit {label: "FlowCell ID"; text <=> root.fc_id; row: 2;col: 3;}
+        GridLineEdit {label: "FlowCell Pores"; text <=> root.fc_pores; row: 3;col: 3;}
+        GridLineEdit {label: "FlowCell Prior Uses"; text <=> root.fc_uses; row: 4;col: 3; }
+
+        // row 6 pirnaha
+        HorizontalLayout { spacing: 10px; padding: 0px; row: 6; col: 0; colspan: 4;
+        GridLineEdit {label: "Samples"; text <=> root.sample_file; box_length: 900px;}
+        Button {text: "Select"; width: 10%; colorize-icon: false; height: 25px; clicked => {select_file("sample_file");}}
+        }
+        // row 7 epi
+        HorizontalLayout { spacing: 10px; padding: 0px; row: 7; col: 0; colspan: 4;
+        GridLineEdit {label: "Epi Info"; text <=> root.epiinfo_file; box_length: 900px;}
+        Button {text: "Select"; width: 10%; height: 25px; clicked => {select_file("epiinfo_file");}}
+        }
+        // row 8 dest
+        HorizontalLayout { spacing: 10px; padding: 0px; row: 8; col: 0; colspan: 4;
+        GridLineEdit {label: "Destination"; text <=> root.destination; box_length: 900px;}
+        Button {text: "Select"; width: 10%; height: 25px; clicked => {select_file("destination");}}
+        }
+        // row 9 buttons
+        HorizontalLayout {row: 9; col: 0; colspan: 5; spacing: 115px; padding-left: 180px;
+        Button {text: "Merge"; width: 80px; height: 10%;clicked => {merge("merge")} }
+        Button {text: "Update"; width: 80px; height: 10%;clicked => {merge("update")} }
+        Button {text: "Clear"; width: 80px; height: 10%; clicked => {clear()} }
+        Button {text: "Template"; width: 80px; height: 10%; clicked => {template()} }
+        Button {text: "Guide"; width: 80px; height: 10%; clicked => {root.show_guide = 1.0} }
+        }
+    }
+
+    // Version Number in bottom right
+    Text {text: "Version 1.0.0"; x: 1175px; y: 370px;}
+
+    // messagebox
+    ErrorBox {
+        title: root.error_title;
+        message: root.error_message;
+        state <=> root.show_error;
+    }
+
+    InfoBox {
+        title: root.info_title;
+        message: root.info_message;
+        state <=> root.show_info;
+    }
+
+    Guide {
+        state <=> root.show_guide;
+    }
+    
+
+
+
+
+}
