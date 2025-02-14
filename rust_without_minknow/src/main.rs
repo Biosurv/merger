@@ -7,12 +7,6 @@ use polars::prelude::*;
 use slint::SharedString;
 use dirs;
 use regex::Regex;
-//use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
-use scraper::{Html, Selector};
-use serde_json::Value;
-//use std::error::Error;
 
 /*
     Version: 1.0.0
@@ -31,7 +25,6 @@ use serde_json::Value;
 
 */
 
-
 fn main() {
     let ui = AppWindow::new().unwrap();
     
@@ -40,14 +33,13 @@ fn main() {
     let ui_handle = ui.as_weak();
     
     // for testing
-    ui.set_minknow_file(SharedString::from("C:\\Users\\SheanMobed\\Documents\\Coding\\DDNS_apps\\reports\\20250206_005_report_FBA38845_20250206_1539_74ce1900.html"));
     ui.set_sample_file(SharedString::from("C:\\Users\\SheanMobed\\OneDrive - Biosurv International\\Desktop\\samples.csv"));
-    ui.set_epiinfo_file(SharedString::from("C:\\Users\\SheanMobed\\Documents\\Coding\\Polio\\py_scripts\\epiinfo_master.csv"));
+    ui.set_epiinfo_file(SharedString::from("C:\\Users\\SheanMobed\\Documents\\Coding\\Polio\\epiinfo_master.csv"));
     ui.set_destination(SharedString::from("C:\\Users\\SheanMobed\\OneDrive - Biosurv International\\Desktop"));
 
     ui.on_select_file(move |file_type: SharedString| {
         match file_type.as_str() {
-            "sample_file" | "epiinfo_file" | "minknow_file"=> {
+            "sample_file" | "epiinfo_file" => {
                 // File selection dialog for piranha and epi files
                 if let Some(file_path) = FileDialog::new().pick_file() {
                     let path_str = file_path.to_string_lossy().to_string();
@@ -55,11 +47,7 @@ fn main() {
                     if let Some(ui) = ui_handle.upgrade() {
                         if file_type.as_str() == "sample_file" {
                             ui.set_sample_file(SharedString::from(path_str));
-                        }
-                        else if file_type.as_str() == "minknow_file" {
-                            ui.set_minknow_file(SharedString::from(path_str));
-                        }  
-                        else {
+                        } else {
                             ui.set_epiinfo_file(SharedString::from(path_str));
                         }
                     }
@@ -94,7 +82,7 @@ fn main() {
             ui.set_lab(slint::SharedString::from(empty.clone()));
             ui.set_run_num(slint::SharedString::from(empty.clone()));
             ui.set_pir_ver(slint::SharedString::from(empty.clone()));
-            ui.set_minknow_ver(slint::SharedString::from(empty.clone()));
+            ui.set_mink_ver(slint::SharedString::from(empty.clone()));
             ui.set_rt_date(slint::SharedString::from(empty.clone()));
             ui.set_vp1_date(slint::SharedString::from(empty.clone()));
             ui.set_seq_date(slint::SharedString::from(empty.clone()));
@@ -104,7 +92,6 @@ fn main() {
             ui.set_fc_pores(slint::SharedString::from(empty.clone()));
             ui.set_fc_uses(slint::SharedString::from(empty.clone()));
 
-            ui.set_minknow_file(slint::SharedString::from(empty.clone()));
             ui.set_sample_file(slint::SharedString::from(empty.clone()));
             ui.set_epiinfo_file(slint::SharedString::from(empty.clone()));
             ui.set_destination(slint::SharedString::from(empty.clone()));
@@ -126,7 +113,6 @@ fn main() {
         let mut epiinfo_missing = false;
 
         if ui.get_sample_file().is_empty()  {println!("No Sample File Selected"); files_present = false;}
-        if ui.get_minknow_file().is_empty()  {println!("No MinKNOW File Selected"); files_present = false;}
         if ui.get_epiinfo_file().is_empty() {epiinfo_missing = true;}
         if ui.get_destination().is_empty()  {println!("No Destination Selected"); files_present = false;}
         
@@ -137,7 +123,6 @@ fn main() {
         // get file path strings
         let piranha_path = ui.get_sample_file().to_string();
         let epiinfo_path = ui.get_epiinfo_file().to_string();
-        let minknow_path = ui.get_minknow_file().to_string();
         let destination_path = ui.get_destination().to_string();
         
         // CSV check
@@ -154,123 +139,6 @@ fn main() {
             ui.set_show_error(1.0);
             return;
         }
-
-        // HTML Check
-        if !minknow_path.ends_with(".html") {
-            ui.set_error_title(slint::SharedString::from("Invalid Input"));
-            ui.set_error_message(slint::SharedString::from("File selected is not a HTML file. Please change to HTML."));
-            ui.set_show_error(1.0);
-            return;
-        }
-
-        // Read the HTML file
-        let mut html_content = String::new();
-        let _ = File::open(minknow_path).expect("WRONG FORMAT").read_to_string(&mut html_content);
-
-        let document = Html::parse_document(&html_content);
-
-        let script_selector: Selector = Selector::parse("script").expect("SELECTOR ERR");
-
-        // Find the report data
-        let mut script_tag = None;
-        for script in document.select(&script_selector) {
-            let text = script.text().collect::<String>();
-            if text.contains("const reportData=") {
-                script_tag = Some(script);
-                break;
-            }
-        }
-
-        // Parse REACT JSON if found
-        if let Some(script) = script_tag {
-            let script_text = script.text().collect::<String>();
-            if let Some(json_str) = script_text
-                .split("const reportData=")
-                .nth(1)
-                .and_then(|s| s.split(';').next())
-                .map(|s| s.trim()) 
-            {
-                if let Ok(report_data) = serde_json::from_str::<Value>(json_str) {
-                    // Extract MinKNOW version
-                    if let Some(software_versions) = report_data.get("software_versions").and_then(|v| v.as_array()) {
-                        for version in software_versions {
-                            if version.get("title").and_then(|t| t.as_str()) == Some("MinKNOW") {
-                                let version_str = version.get("value").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                                ui.set_minknow_ver(SharedString::from(version_str));
-                            }
-                        }
-                    }
-
-                    // Extract fc id and kit
-                    if let Some(run_config) = report_data.get("run_setup").and_then(|v| v.as_array()) {
-                        for config in run_config {
-                            match config.get("title").and_then(|t| t.as_str()) {
-                                // Some("Flow cell type") => {
-                                //     let flow_cell_type = config.get("value").and_then(|v| v.as_str()).map(String::from);
-                                //     ui.set_fc
-                                // }
-                                Some("Flow cell ID") => {
-                                    let flow_cell_id = config.get("value").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                                    ui.set_fc_id(SharedString::from(flow_cell_id));
-                                }
-                                Some("Kit type") => {
-                                    let kit_type = config.get("value").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                                    ui.set_seq_kit(SharedString::from(kit_type));
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-
-                    // Extract run hours
-                    if let Some(run_config) = report_data.get("run_settings").and_then(|v| v.as_array()) {
-                        for config in run_config {
-                            match config.get("title").and_then(|t| t.as_str()) {
-                                Some("Run limit") => {
-                                    let run_time = config.get("value").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                                    ui.set_seq_hours(SharedString::from(run_time));
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-
-                    if let Some(json_str) = script_text
-                    .split("const reportData=")
-                    .nth(1)
-                    .and_then(|s| s.split(';').next())
-                    .map(|s| s.trim()) 
-                {
-                    if let Ok(report_data) = serde_json::from_str::<Value>(json_str) {
-                        // Extract run_end_time
-                        let date = report_data.get("run_end_time").and_then(|v| v.as_str()).and_then(|s| s.split('T').next()).unwrap_or("Unknown").to_string();
-                        ui.set_seq_date(SharedString::from(date));
-                    }
-                }
-                //     if let Some(header) = report_data.get("header") {
-                //         let device = header.get("device_type").and_then(|v| v.as_str()).unwrap_or("Unknown");
-                //         ui.set_device
-                // }
-                // Extract the pore data
-                    if let Some(series_data) = report_data.get("pore_scan")
-                    .and_then(|v| v.get("series_data"))
-                    .and_then(|v| v.as_array()) {
-
-                    if let Some(pore_available) = series_data.iter().find(|&s| s.get("name").and_then(|n| n.as_str()) == Some("Pore available")) {
-                        if let Some(data) = pore_available.get("data").and_then(|v| v.as_array()) {
-                            if let Some(first_data_pair) = data.get(0) {
-                                if let Some(value) = first_data_pair.get(1).and_then(|v| v.as_i64()) {
-                                    let run_pores = Some(value).unwrap_or(0).to_string();
-                                    ui.set_fc_pores(SharedString::from(run_pores));
-                                }
-                            }
-                        }
-                    }
-                    }
-                }
-            }
-        }
-    
 
         // create piranha df
         let mut sample_df = CsvReadOptions::default()
@@ -389,23 +257,6 @@ fn main() {
             let neg_con = ui.get_neg_con().to_string();
             let neg_con = match neg_con.as_str() {"true" => "Pass", "false" => "Fail", _ => "unknown",};
 
-            // Regex for yyyymmdd_XXX format
-            let run_num_regex = Regex::new(r"^\d{8}-\d{3}$").unwrap();
-
-            let run_num = ui.get_run_num();
-
-            let mut run_num_err = String::from("");
-            
-            if !run_num.is_empty() && !run_num_regex.is_match(run_num.as_str()) {
-                    run_num_err = format!("\n\nInvalid run number format: {run_num} \nExpected yyyymmdd_xxx.");
-                
-                    // ui.set_error_title(slint::SharedString::from("Run Number Format Error"));
-                    // ui.set_error_message(slint::SharedString::from(run_num_err));
-                    // ui.set_show_error(1.0);
-                    // println!("Exit on run number format error");
-                    // return;
-            }
-
             // Date format check
             let rt_date = ui.get_rt_date();
             let vp1_date = ui.get_vp1_date();
@@ -426,7 +277,7 @@ fn main() {
 
             for (index, date) in date_fields.iter().enumerate() {
                 if !date.is_empty() && !date_regex.is_match(date) {
-                    let date_err = format!("Invalid date format for field {}: {}", 
+                    let date_err = format!("Invalid date format for field {}: {}. Expected yyyy-mm-dd", 
                         match index {
                             0 => "RT PCR Date",
                             1 => "VP1 PCR Date",
@@ -438,22 +289,14 @@ fn main() {
                     );
 
                     date_errors.push(date_err);
-
                 }
             }
 
-            if !date_errors.is_empty() || !run_num_err.is_empty(){
-                if !date_errors.is_empty(){
-                        date_errors.push(String::from("Expected yyyy-mm-dd."));
-                }
-
-                let joint_date_errors = date_errors.join("\n\n");
-                //let combined_error = format!("{joint_date_errors}");
+            if !date_errors.is_empty() {
+                let combined_error = date_errors.join("\n");
                 
-                let format_err = format!("\n{joint_date_errors} \n {run_num_err} \n\n Refer to the Guide for more information.");
-
-                ui.set_error_title(slint::SharedString::from("Input Format Error"));
-                ui.set_error_message(slint::SharedString::from(format_err));
+                ui.set_error_title(slint::SharedString::from("Date Format Error"));
+                ui.set_error_message(slint::SharedString::from(combined_error));
                 ui.set_show_error(1.0);
                 println!("Exit on date format error");
                 return;
@@ -464,7 +307,7 @@ fn main() {
                                         .with_columns([
                                             col("SequencingLab").fill_null(lit(ui.get_lab().as_str())),
                                             col("RunNumber").fill_null(lit(ui.get_run_num().as_str())),
-                                            col("MinKNOWSoftwareVersion").fill_null(lit(ui.get_minknow_ver().as_str())),
+                                            col("MinKNOWSoftwareVersion").fill_null(lit(ui.get_mink_ver().as_str())),
                                             col("DateRTPCR").fill_null(lit(ui.get_rt_date().as_str())),
                                             col("DateVP1PCR").fill_null(lit(ui.get_vp1_date().as_str())),
                                             col("BrandOfPCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
@@ -491,8 +334,7 @@ fn main() {
         };
 
         // saving to destionation
-        let file_name = format!("{}_merger_output.csv", ui.get_run_num().as_str());
-        let file_path = format!("{destination_path}/{file_name}");
+        let file_path = format!("{}/output.csv", destination_path);
         let mut file = std::fs::File::create(file_path).unwrap();
         CsvWriter::new(&mut file).finish(&mut merged_df).unwrap();
 
@@ -503,7 +345,7 @@ fn main() {
             "merge" => {
                 println!("MERGE MSG");
                 ui.set_info_title(slint::SharedString::from("Merge Succesful"));
-                ui.set_info_message(slint::SharedString::from(format!("Merged Detailed Run Report saved to destination as {file_name}.")));
+                ui.set_info_message(slint::SharedString::from("Merged Detailed Run Report saved to destination."));
                 ui.set_show_info(1.0);
             }
 
