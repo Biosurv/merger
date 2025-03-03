@@ -1,7 +1,8 @@
-/CameroonDB
-/target
-/*.build
-/*.dist
-/*.onefile-build
+/'Python Version'/CameroonDB/
+/target/
+**/*.build/
+**/*.dist/
+**/*.onefile-build/
+/rust_without_minknow/
 *.exe
 template_generator.py
