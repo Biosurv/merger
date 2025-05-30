@@ -382,12 +382,12 @@ class App(QMainWindow):
             QMessageBox.information(self,'Saved','Barcodes Template saved to Downloads')
             
         else:
-            well_list = [f'{chr(row)}{str(col).zfill(2)}' for row, col in product(range(65, 73), range(1, 13))]
-            labinfo_cols = "labid,barcode,IsQCRetest,IfRetestOriginalRun,SequencingLab,SampleType,DelaysInProccessingForDDNS,DetailsOfDelays,DateRNAextraction,ExtractionKit,ExtractionType,DateRTPCR,RTPCRMachine,RTPCRcomments,DatePanEVPCR,PanEVPCRMachine,PanEVprimers,PanEVPCRcomments,DateVP1PCR,VP1PCRMachine,VP1primers,VP1PCRcomments,PositiveControlPCRCheck,NegativeControlPCRCheck,LibraryPreparationKit,Well,RunNumber,DateSeqRunLoaded,SequencerUsed,FlowCellVersion,FlowCellID,FlowCellPriorUses,PoresAvilableAtFlowCellCheck,MinKNOWSoftwareVersion,RunHoursDuration".split(',')
-            labinfo_template = pd.DataFrame(columns=labinfo_cols, data={'well':well_list})
-            file_path = os.path.join(downloads_folder, "template_labinfo.csv")
+            #well_list = [f'{chr(row)}{str(col).zfill(2)}' for row, col in product(range(65, 73), range(1, 13))]
+            labinfo_cols = "sample,barcode,IsQCRetest,IfRetestOriginalRun,EPID,SampleType,CaseOrContact,Country,Province,District,StoolCondition,SpecimenNumber,DateOfOnset,DateStoolCollected,DateStoolReceivedinLab,DateStoolsuspension,DateRNAextraction,DateRTPCR,RTPCRMachine,RTPCRprimers,DateVP1PCR,VP1PCRMachine,VP1primers,PositiveControlPCRCheck,NegativeControlPCRCheck,LibraryPreparationKit,Well,RunNumber,DateSeqRunLoaded,SequencerUsed,FlowCellVersion,FlowCellID,FlowCellPriorUses,PoresAvilableAtFlowCellCheck,MinKNOWSoftwareVersion,RunHoursDuration,DateFastaGenerated,AnalysisPipelineVersion,RunQC,DDNSclassification,SampleQC,SampleQCChecksComplete,QCComments,DateReported".split(',')
+            labinfo_template = pd.DataFrame(columns=labinfo_cols)
+            file_path = os.path.join(downloads_folder, "sample_template.csv")
             labinfo_template.to_csv(file_path, index=False)
-            QMessageBox.information(self,'Saved','LabInfo Template saved to Downloads')
+            QMessageBox.information(self,'Saved','Sample CSV Template saved to Downloads')
             
             
                            
@@ -481,8 +481,8 @@ class App(QMainWindow):
                 
         # LabInfo Format Checker                       
         try:
-            labinfo_fmt = "labid,barcode,IsQCRetest,IfRetestOriginalRun,SequencingLab,SampleType,DelaysInProccessingForDDNS,DetailsOfDelays,DateRNAextraction,ExtractionKit,ExtractionType,DateRTPCR,RTPCRMachine,RTPCRcomments,DatePanEVPCR,PanEVPCRMachine,PanEVprimers,PanEVPCRcomments,DateVP1PCR,VP1PCRMachine,VP1primers,VP1PCRcomments,PositiveControlPCRCheck,NegativeControlPCRCheck,LibraryPreparationKit,Well,RunNumber,DateSeqRunLoaded,SequencerUsed,FlowCellVersion,FlowCellID,FlowCellPriorUses,PoresAvilableAtFlowCellCheck,MinKNOWSoftwareVersion,RunHoursDuration".split(',')
-            lablist = lablist[labinfo_fmt]
+            labinfo_cols = "sample,barcode,IsQCRetest,IfRetestOriginalRun,EPID,SampleType,CaseOrContact,Country,Province,District,StoolCondition,SpecimenNumber,DateOfOnset,DateStoolCollected,DateStoolReceivedinLab,DateStoolsuspension,DateRNAextraction,DateRTPCR,RTPCRMachine,RTPCRprimers,DateVP1PCR,VP1PCRMachine,VP1primers,PositiveControlPCRCheck,NegativeControlPCRCheck,LibraryPreparationKit,Well,RunNumber,DateSeqRunLoaded,SequencerUsed,FlowCellVersion,FlowCellID,FlowCellPriorUses,PoresAvilableAtFlowCellCheck,MinKNOWSoftwareVersion,RunHoursDuration,DateFastaGenerated,AnalysisPipelineVersion,RunQC,DDNSclassification,SampleQC,SampleQCChecksComplete,QCComments,DateReported".split(',')
+            lablist = lablist[labinfo_cols]
             
             # merge dataframes based on sample from lablist and ICLabID from epiinfo
             lablist.columns = lablist.columns.str.encode('ascii','ignore').str.decode('ascii')
@@ -529,13 +529,12 @@ class App(QMainWindow):
             merged_df = merged_df.rename(columns={'labid':'sample'}).replace('nan','')
             
             # Add Extra Info columns
-            extra_info = ['DateFastaGenerated','AnalysisPipelineVersion','RunQC','DDNSclassification','SampleQC','SampleQCChecksComplete','QCComments','ToReport','DateReported','EmergenceGroupVDPV1','EmergenceGroupVDPV2','EmergenceGroupVDPV3']
-            merged_df[extra_info] = 12 * ''
+            # extra_info = ['DateFastaGenerated','AnalysisPipelineVersion','RunQC','DDNSclassification','SampleQC','SampleQCChecksComplete','QCComments','ToReport','DateReported','EmergenceGroupVDPV1','EmergenceGroupVDPV2','EmergenceGroupVDPV3']
+            # merged_df[extra_info] = 12 * ''
            
             # Setting to final format before output
             final_fmt = "sample;barcode;EPID;institute;IsQCRetest;IfRetestOriginalRun;EpidNumber;SequencingLab;SampleType;CaseOrContact;Country;Province;District;StoolCondition;SpecimenNumber;DateOfOnset;DateStoolCollected;DateStoolSentfromField;DateStoolReceivedNatLevel;DateStoolSentToLab;DateStoolReceivedinLab;FinalCellCultureResult;DateFinalCellCultureResults;FinalITDResult;DateFinalrRTPCRResults;DateIsolateSentforSeq;SequenceName;DateSeqResult;DelaysInProccessingForDDNS;DetailsOfDelays;DateRNAextraction;ExtractionKit;ExtractionType;DateRTPCR;RTPCRMachine;RTPCRcomments;DatePanEVPCR;PanEVPCRMachine;PanEVprimers;PanEVPCRcomments;DateVP1PCR;VP1PCRMachine;VP1primers;VP1PCRcomments;PositiveControlPCRCheck;NegativeControlPCRCheck;LibraryPreparationKit;Well;RunNumber;DateSeqRunLoaded;SequencerUsed;FlowCellVersion;FlowCellID;FlowCellPriorUses;PoresAvilableAtFlowCellCheck;MinKNOWSoftwareVersion;RunHoursDuration;DateFastaGenerated;AnalysisPipelineVersion;RunQC;DDNSclassification;SampleQC;SampleQCChecksComplete;QCComments;ToReport;DateReported;EmergenceGroupVDPV1;EmergenceGroupVDPV2;EmergenceGroupVDPV3;NonPolioEV|closest_reference;NonPolioEV|num_reads;NonPolioEV|nt_diff_from_reference;NonPolioEV|pcent_match;NonPolioEV|classification;Sabin1-related|closest_reference;Sabin1-related|num_reads;Sabin1-related|nt_diff_from_reference;Sabin1-related|pcent_match;Sabin1-related|classification;Sabin2-related|closest_reference;Sabin2-related|num_reads;Sabin2-related|nt_diff_from_reference;Sabin2-related|pcent_match;Sabin2-related|classification;Sabin3-related|closest_reference;Sabin3-related|num_reads;Sabin3-related|nt_diff_from_reference;Sabin3-related|pcent_match;Sabin3-related|classification;WPV1|closest_reference;WPV1|num_reads;WPV1|nt_diff_from_reference;WPV1|pcent_match;WPV1|classification;WPV2|closest_reference;WPV2|num_reads;WPV2|nt_diff_from_reference;WPV2|pcent_match;WPV2|classification;WPV3|closest_reference;WPV3|num_reads;WPV3|nt_diff_from_reference;WPV3|pcent_match;WPV3|classification;PositiveControl|closest_reference;PositiveControl|num_reads;PositiveControl|nt_diff_from_reference;PositiveControl|pcent_match;PositiveControl|classification;comments".split(';')
             merged_df = merged_df[final_fmt]
-
         except KeyError as e:
                 print(e)                
                 if self.lang_combobox.currentText() == 'English':

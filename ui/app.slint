@@ -1,4 +1,4 @@
-import { Button, VerticalBox, LineEdit, StandardTableView, HorizontalBox, CheckBox, ComboBox } from "std-widgets.slint";
+import { Button, VerticalBox, LineEdit, StandardTableView, HorizontalBox, CheckBox, ComboBox, TextEdit, TextEdit } from "std-widgets.slint";
 
 export component GridLineEdit {
     in property <string> label;
@@ -8,7 +8,7 @@ export component GridLineEdit {
 
     HorizontalLayout {
         spacing: 10px;
-        Text {text: label;vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px;}
+        Text {text: label;vertical-alignment: center;horizontal-alignment: left;font-size: 15px; font-weight: 500;width: 130px;color: black;}
         LineEdit{text <=> root.text ; height: 25px; width: root.box_length; horizontal-alignment: left; placeholder-text: root.yyyymmdd;}
     }
 }
@@ -214,8 +214,8 @@ export component AppWindow inherits Window {
    in-out property <string> minknow_ver;
 
    // controls
-   in-out property <bool> pos_con <=> pos-box.checked;
-   in-out property <bool> neg_con <=> neg-box.checked;
+   in-out property <string> pos_con <=> pos-box.current-value;
+   in-out property <string> neg_con <=> neg-box.current-value;
 
    // pcr info
    in-out property <string> rt_date;
@@ -255,7 +255,7 @@ export component AppWindow inherits Window {
     //     border-color: black; border-radius: 10px; border-width: 1px; padding: 8px;
 
     // gradient background
-    Rectangle {background: @linear-gradient(180deg, #fce0b0 0%, #f7ae6c 50%, #ed6d37 75%, #e73c25 100%);
+    Rectangle {background: @linear-gradient(180deg, #fce0b0 85%, #e73c25 100%);
     border-color: black;border-width: 2px;
     }
 
@@ -264,7 +264,7 @@ export component AppWindow inherits Window {
         spacing: 10px; padding: 15px;
 
         // row 0 title and logo
-        Text {text: "                      Merger"; font-size: 30px;
+        Text {text: "                      Merger"; font-size: 30px; color: black;
         horizontal-alignment: center; vertical-alignment: center; row: 0; col: 1; colspan: 2;}
         Image {
         source: @image-url("psc_logo.png");
@@ -275,7 +275,7 @@ export component AppWindow inherits Window {
 
         // row 1 gen info
         Rectangle {row: 1; col: 0; border-color: black; border-width: 2px;}
-        Text {text: "GENERAL INFO"; row: 1; col: 0; font-weight: 500;
+        Text {text: "GENERAL INFO"; row: 1; col: 0; font-weight: 500; color: black;
             height: 5%; horizontal-alignment: center; vertical-alignment: center;}
         GridLineEdit {label: "Laboratory"; text <=> root.lab; row: 1;col: 1;}
         GridLineEdit {label: "Run Number"; text <=> root.run_num; yyyymmdd: "YYYYMMDD_XXX";row: 1;col: 2;}
@@ -284,7 +284,7 @@ export component AppWindow inherits Window {
 
         // row 2 pcr info
         Rectangle {row: 2; col: 0; border-color: black; border-width: 2px;}
-        Text {text: "PCR INFO"; row: 2; col: 0; height: 5%; font-weight: 500;
+        Text {text: "PCR INFO"; row: 2; col: 0; height: 5%; font-weight: 500; color: black;
          horizontal-alignment: center; vertical-alignment: center;}
         GridLineEdit {label: "RT Date"; text <=> root.rt_date; yyyymmdd: "YYYY-MM-DD"; row: 2;col: 1;}
         GridLineEdit {label: "VP1 Date"; text <=> root.vp1_date; yyyymmdd: "YYYY-MM-DD"; row: 2;col: 2;}
@@ -293,15 +293,15 @@ export component AppWindow inherits Window {
 
         // row 3 controls + fc use
         Rectangle {row: 3; col: 0; border-color: black; border-width: 2px;}
-        Text {text: "PCR CONTROL CHECK"; row: 3; col: 0; height: 5%; font-weight: 500;
+        Text {text: "PCR CONTROL CHECK"; row: 3; col: 0; height: 5%; font-weight: 500; color: black;
               horizontal-alignment: center; vertical-alignment: center;}
         HorizontalLayout {row: 3;col: 1;
-        pos_box:= CheckBox {text: "Positive";} 
-        neg_box:= CheckBox {text: "Negative";}
+        pos_box:= ComboBox {model: ["Unselected","Positive Passed","Positive Failed"]; current-index: 0;} 
+        neg_box:= ComboBox {model: ["Unselected","Negative Passed","Negative Failed"]; current-index: 0;}
         }
 
         Rectangle {row: 3; col: 2; border-color: black; border-width: 2px;}
-        Text {text: "SEQUENCING INFO"; row: 3; col: 2; height: 5%; font-weight: 500;
+        Text {text: "SEQUENCING INFO"; row: 3; col: 2; height: 5%; font-weight: 500; color: black;
               horizontal-alignment: center; vertical-alignment: center;}
         GridLineEdit {label: "FlowCell Prior Uses"; text <=> root.fc_uses; row: 3;col: 3;}
 
@@ -313,7 +313,7 @@ export component AppWindow inherits Window {
         // row 6 minkonw
         HorizontalLayout { spacing: 10px; padding: 0px; row: 6; col: 0; colspan: 4;
         GridLineEdit {label: "MinKNOW"; text <=> root.minknow_file; box_length: 900px;}
-        Button {text: "Select"; width: 10%; colorize-icon: false; height: 25px; clicked => {select_file("minknow_file");}}
+        Button {text: "Select"; width: 10%;colorize-icon: false; height: 25px; clicked => {select_file("minknow_file");}}
         }
         // row 7 epi
         HorizontalLayout { spacing: 10px; padding: 0px; row: 7; col: 0; colspan: 4;

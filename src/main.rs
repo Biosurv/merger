@@ -1,4 +1,4 @@
-//#![windows_subsystem = "windows"]
+#![windows_subsystem = "windows"]
 
 slint::slint!(export {AppWindow} from "ui/app.slint";);
 
@@ -295,18 +295,15 @@ fn main() {
 
         //  column requirements
         let expected_columns = [
-        "barcode", "sample", "EPID", "SequencingLab", "IsQCRetest",
-        "IfRetestOriginalRun", "SampleType", "CaseContactOrCommunity",
-        "CountryOfSampleOrigin", "StoolCondition", "SpecimenNumber",
-        "DateOfOnset", "DateSampleCollected", "DateReceivedinLab", "CultureResult",
-        "DateFinalCultureResult", "ITD_Result", "DateFinalITDresult", "SangerSequenceID",
-        "DateSangerResultGenerated", "DelaysInProccessingForDDNS", "DetailsOfDelays",
-        "DateRNA_Extraction", "DateRTPCR", "RT_PCR_comments", "DateVP1PCR", "PCR_comments",
-        "BrandOfPCRMachine", "PositiveControlPCRCheck", "NegativeControlPCRheck",
-        "LibraryPreparationKit", "DateSeqRunLoaded", "RunNumber", "FlowCellID",
-        "FlowCellPriorUses", "PoresAvilableAtFlowCellCheck", "MinKNOWSoftwareVersion",
-        "RunHoursDuration", "Date_Fasta_generated", "RunQC", "SampleQC",
-        "SampleQCChecksComplete", "QCComments", "ToReport", "DateReported",
+        "sample", "barcode", "IsQCRetest", "IfRetestOriginalRun", "EPID",
+        "institute", "SampleType", "CaseOrContact", "Country", "Province", "District", "StoolCondition",
+        "SpecimenNumber", "DateOfOnset", "DateStoolCollected", "DateStoolReceivedinLab",
+        "DateRNAextraction", "DateRTPCR", "RTPCRMachine", "RTPCRprimers","DateVP1PCR", "VP1PCRMachine",
+        "VP1primers", "PositiveControlPCRCheck", "NegativeControlPCRCheck",
+        "LibraryPreparationKit", "Well", "RunNumber", "DateSeqRunLoaded", "SequencerUsed", 
+        "FlowCellVersion", "FlowCellID", "FlowCellPriorUses", "PoresAvilableAtFlowCellCheck",
+        "MinKNOWSoftwareVersion","RunHoursDuration", "DateFastaGenerated", "AnalysisPipelineVersion","RunQC", "Classification",
+        "SampleQC", "SampleQCChecksComplete", "QCComments", "DateReported",
         ];
 
         // Validate headers for the sample DataFrame
@@ -335,13 +332,13 @@ fn main() {
             Some(epiinfo_df) => {
                 println!("Merging with EPI");
                 // rename epi columns to match epi info columns
-                let mut sample_df = sample_df.rename("EPID", PlSmallStr::from_str("EpidNumber")).unwrap();
-                sample_df = sample_df.rename("CaseContactOrCommunity", PlSmallStr::from_str("CaseOrContact")).unwrap();
-                sample_df = sample_df.rename("DateReceivedinLab", PlSmallStr::from_str("DateStoolReceivedinLab")).unwrap();
-                sample_df = sample_df.rename("DateSampleCollected", PlSmallStr::from_str("DateStoolCollected")).unwrap();
-                sample_df = sample_df.rename("CultureResult", PlSmallStr::from_str("FinalCellCultureResult")).unwrap();
-                sample_df = sample_df.rename("DateFinalCultureResult", PlSmallStr::from_str("DateFinalCellCultureResults")).unwrap();
-                sample_df = sample_df.rename("ITD_Result", PlSmallStr::from_str("FinalITDResult")).unwrap();
+                let sample_df = sample_df.rename("EPID", PlSmallStr::from_str("EpidNumber")).unwrap();
+                // sample_df = sample_df.rename("CaseContactOrCommunity", PlSmallStr::from_str("CaseOrContact")).unwrap();
+                // sample_df = sample_df.rename("DateReceivedinLab", PlSmallStr::from_str("DateStoolReceivedinLab")).unwrap();
+                // sample_df = sample_df.rename("DateSampleCollected", PlSmallStr::from_str("DateStoolCollected")).unwrap();
+                // sample_df = sample_df.rename("CultureResult", PlSmallStr::from_str("FinalCellCultureResult")).unwrap();
+                // sample_df = sample_df.rename("DateFinalCultureResult", PlSmallStr::from_str("DateFinalCellCultureResults")).unwrap();
+                // sample_df = sample_df.rename("ITD_Result", PlSmallStr::from_str("FinalITDResult")).unwrap();
 
                 // finding common columns, and then removing them will allow us to get those columns with data from epi info
                 let sample_cols: std::collections::HashSet<String> = sample_df.get_column_names().iter().map(|&s| s.to_string()).collect();
@@ -354,13 +351,13 @@ fn main() {
                 let mut merged_df: DataFrame = sample_df.left_join(&epiinfo_df, ["sample"], ["ICLabID"]).expect("Failed to merge dataframes");
 
                 // revert column naming for expected output
-                let mut merged_df = merged_df.rename("EpidNumber", PlSmallStr::from_str("EPID")).unwrap();
-                merged_df = merged_df.rename("CaseOrContact", PlSmallStr::from_str("CaseContactOrCommunity")).unwrap();
-                merged_df = merged_df.rename("DateStoolReceivedinLab", PlSmallStr::from_str("DateReceivedinLab")).unwrap();
-                merged_df = merged_df.rename("DateStoolCollected", PlSmallStr::from_str("DateSampleCollected")).unwrap();
-                merged_df = merged_df.rename("FinalCellCultureResult", PlSmallStr::from_str("CultureResult")).unwrap();
-                merged_df = merged_df.rename("DateFinalCellCultureResults", PlSmallStr::from_str("DateFinalCultureResult")).unwrap();
-                merged_df = merged_df.rename("FinalITDResult", PlSmallStr::from_str("ITD_Result")).unwrap();
+                let merged_df = merged_df.rename("EpidNumber", PlSmallStr::from_str("EPID")).unwrap();
+                // merged_df = merged_df.rename("CaseOrContact", PlSmallStr::from_str("CaseContactOrCommunity")).unwrap();
+                // merged_df = merged_df.rename("DateStoolReceivedinLab", PlSmallStr::from_str("DateReceivedinLab")).unwrap();
+                // merged_df = merged_df.rename("DateStoolCollected", PlSmallStr::from_str("DateSampleCollected")).unwrap();
+                // merged_df = merged_df.rename("FinalCellCultureResult", PlSmallStr::from_str("CultureResult")).unwrap();
+                // merged_df = merged_df.rename("DateFinalCellCultureResults", PlSmallStr::from_str("DateFinalCultureResult")).unwrap();
+                // merged_df = merged_df.rename("FinalITDResult", PlSmallStr::from_str("ITD_Result")).unwrap();
 
                 println!("completed epi / sample mode");
                 merged_df.select(expected_columns).unwrap()
@@ -384,13 +381,13 @@ fn main() {
             println!("adding run constants");
             // PCR Controls
             let pos_con = ui.get_pos_con().to_string();
-            let pos_con = match pos_con.as_str() {"true" => "Pass", "false" => "Fail", _ => "unknown",};
+            let pos_con = match pos_con.as_str() {"Positive Passed" => "Pass", "Positive Failed" => "Fail", "Unselected" => "", _ => "unknown",};
             
             let neg_con = ui.get_neg_con().to_string();
-            let neg_con = match neg_con.as_str() {"true" => "Pass", "false" => "Fail", _ => "unknown",};
+            let neg_con = match neg_con.as_str() {"Negative Passed" => "Pass", "Negative Failed" => "Fail", "Unselected" => "", _ => "unknown",};
 
             // Regex for yyyymmdd_XXX format
-            let run_num_regex = Regex::new(r"^\d{8}-\d{3}$").unwrap();
+            let run_num_regex = Regex::new(r"^\d{8}_\d{3}$").unwrap();
 
             let run_num = ui.get_run_num();
 
@@ -462,21 +459,23 @@ fn main() {
             // Fill in run constant values
             let merged_df: DataFrame = merged_df.clone().lazy()
                                         .with_columns([
-                                            col("SequencingLab").fill_null(lit(ui.get_lab().as_str())),
+                                            col("institute").fill_null(lit(ui.get_lab().as_str())),
                                             col("RunNumber").fill_null(lit(ui.get_run_num().as_str())),
                                             col("MinKNOWSoftwareVersion").fill_null(lit(ui.get_minknow_ver().as_str())),
+                                            col("AnalysisPipelineVersion").fill_null(lit(ui.get_pir_ver().as_str())),
                                             col("DateRTPCR").fill_null(lit(ui.get_rt_date().as_str())),
                                             col("DateVP1PCR").fill_null(lit(ui.get_vp1_date().as_str())),
-                                            col("BrandOfPCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
+                                            col("RTPCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
+                                            col("VP1PCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
                                             col("PositiveControlPCRCheck").cast(DataType::String).fill_null(lit(pos_con)),
-                                            col("NegativeControlPCRheck").cast(DataType::String).fill_null(lit(neg_con)),
+                                            col("NegativeControlPCRCheck").cast(DataType::String).fill_null(lit(neg_con)),
                                             col("LibraryPreparationKit").fill_null(lit(ui.get_seq_kit().as_str())),
                                             col("DateSeqRunLoaded").fill_null(lit(ui.get_seq_date().as_str())),
                                             col("FlowCellID").fill_null(lit(ui.get_fc_id().as_str())),
                                             col("FlowCellPriorUses").fill_null(lit(ui.get_fc_uses().as_str())),
                                             col("PoresAvilableAtFlowCellCheck").fill_null(lit(ui.get_fc_pores().as_str())),
                                             col("RunHoursDuration").fill_null(lit(ui.get_seq_hours().as_str())),
-                                            col("Date_Fasta_generated").fill_null(lit(ui.get_fasta_date().as_str())),
+                                            col("DateFastaGenerated").fill_null(lit(ui.get_fasta_date().as_str())),
                                         ]).collect().unwrap();
             println!("{:?}", merged_df);
             merged_df.select(expected_columns).unwrap()
@@ -532,50 +531,49 @@ fn main() {
             let file_path = dirs::download_dir().expect("No Downloads folder found").join("sample_template.csv");
 
             let mut df = df![
-            "barcode" => Vec::<String>::new(),
             "sample" => Vec::<String>::new(),
-            "EPID" => Vec::<String>::new(),
-            "SequencingLab" => Vec::<String>::new(),
+            "barcode" => Vec::<String>::new(),
             "IsQCRetest" => Vec::<String>::new(),
             "IfRetestOriginalRun" => Vec::<String>::new(),
+            "EPID" => Vec::<String>::new(),
+            "institute" => Vec::<String>::new(),
             "SampleType" => Vec::<String>::new(),
-            "CaseContactOrCommunity" => Vec::<String>::new(),
-            "CountryOfSampleOrigin" => Vec::<String>::new(),
+            "CaseOrContact" => Vec::<String>::new(),
+            "Country" => Vec::<String>::new(),
+            "Province" => Vec::<String>::new(),
+            "District" => Vec::<String>::new(),
             "StoolCondition" => Vec::<String>::new(),
             "SpecimenNumber" => Vec::<String>::new(),
             "DateOfOnset" => Vec::<String>::new(),
-            "DateSampleCollected" => Vec::<String>::new(),
-            "DateReceivedinLab" => Vec::<String>::new(),
-            "CultureResult" => Vec::<String>::new(),
-            "DateFinalCultureResult" => Vec::<String>::new(),
-            "ITD_Result" => Vec::<String>::new(),
-            "DateFinalITDresult" => Vec::<String>::new(),
-            "SangerSequenceID" => Vec::<String>::new(),
-            "DateSangerResultGenerated" => Vec::<String>::new(),
-            "DelaysInProccessingForDDNS" => Vec::<String>::new(),
-            "DetailsOfDelays" => Vec::<String>::new(),
-            "DateRNA_Extraction" => Vec::<String>::new(),
+            "DateStoolCollected" => Vec::<String>::new(),
+            "DateStoolReceivedinLab" => Vec::<String>::new(),
+            "DateRNAextraction" => Vec::<String>::new(),
             "DateRTPCR" => Vec::<String>::new(),
-            "RT_PCR_comments" => Vec::<String>::new(),
+            "RTPCRMachine" => Vec::<String>::new(),
+            "RTPCRprimers" => Vec::<String>::new(),
             "DateVP1PCR" => Vec::<String>::new(),
-            "PCR_comments" => Vec::<String>::new(),
-            "BrandOfPCRMachine" => Vec::<String>::new(),
+            "VP1PCRMachine" => Vec::<String>::new(),
+            "VP1primers" => Vec::<String>::new(),
             "PositiveControlPCRCheck" => Vec::<String>::new(),
-            "NegativeControlPCRheck" => Vec::<String>::new(),
+            "NegativeControlPCRCheck" => Vec::<String>::new(),
             "LibraryPreparationKit" => Vec::<String>::new(),
-            "DateSeqRunLoaded" => Vec::<String>::new(),
+            "Well" => Vec::<String>::new(),
             "RunNumber" => Vec::<String>::new(),
+            "DateSeqRunLoaded" => Vec::<String>::new(),
+            "SequencerUsed" => Vec::<String>::new(),
+            "FlowCellVersion" => Vec::<String>::new(),
             "FlowCellID" => Vec::<String>::new(),
             "FlowCellPriorUses" => Vec::<String>::new(),
             "PoresAvilableAtFlowCellCheck" => Vec::<String>::new(),
             "MinKNOWSoftwareVersion" => Vec::<String>::new(),
             "RunHoursDuration" => Vec::<String>::new(),
-            "Date_Fasta_generated" => Vec::<String>::new(),
+            "DateFastaGenerated" => Vec::<String>::new(),
+            "AnalysisPipelineVersion" => Vec::<String>::new(),
             "RunQC" => Vec::<String>::new(),
+            "Classification" => Vec::<String>::new(),
             "SampleQC" => Vec::<String>::new(),
             "SampleQCChecksComplete" => Vec::<String>::new(),
             "QCComments" => Vec::<String>::new(),
-            "ToReport" => Vec::<String>::new(),
             "DateReported" => Vec::<String>::new()
             ].unwrap();
 
