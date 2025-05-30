@@ -6,3 +6,4 @@
 /rust_without_minknow/
 *.exe
 template_generator.py
+*.log
