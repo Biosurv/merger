@@ -12,10 +12,7 @@ use std::fs::File;
 use std::io::Read;
 use scraper::{Html, Selector};
 use serde_json::Value;
-<<<<<<< HEAD
-=======
 use update_checker::UpdateChecker;
->>>>>>> 3e3286f (Updater checker and error handling)
 //use std::error::Error;
 
 /*
@@ -35,21 +32,6 @@ use update_checker::UpdateChecker;
 
 */
 
-<<<<<<< HEAD
-
-fn main() {
-    let ui = AppWindow::new().unwrap();
-    
-    // File Selection Function
-    {
-    let ui_handle = ui.as_weak();
-    
-    // for testing
-    ui.set_minknow_file(SharedString::from("C:\\Users\\SheanMobed\\Documents\\Coding\\DDNS_apps\\reports\\20250206_005_report_FBA38845_20250206_1539_74ce1900.html"));
-    ui.set_sample_file(SharedString::from("C:\\Users\\SheanMobed\\OneDrive - Biosurv International\\Desktop\\samples.csv"));
-    ui.set_epiinfo_file(SharedString::from("C:\\Users\\SheanMobed\\Documents\\Coding\\Polio\\py_scripts\\epiinfo_master.csv"));
-    ui.set_destination(SharedString::from("C:\\Users\\SheanMobed\\OneDrive - Biosurv International\\Desktop"));
-=======
 fn main() {
     let ui = match AppWindow::new() {
         Ok(window) => window,
@@ -126,26 +108,10 @@ fn main() {
         ui.set_destination(SharedString::from("C:\\Users\\MatthewAnderson\\Desktop\\Polio\\examples"));
     }
 
->>>>>>> 3e3286f (Updater checker and error handling)
 
     ui.on_select_file(move |file_type: SharedString| {
         match file_type.as_str() {
             "sample_file" | "epiinfo_file" | "minknow_file"=> {
-<<<<<<< HEAD
-                // File selection dialog for piranha and epi files
-                if let Some(file_path) = FileDialog::new().pick_file() {
-                    let path_str = file_path.to_string_lossy().to_string();
-                    
-                    if let Some(ui) = ui_handle.upgrade() {
-                        if file_type.as_str() == "sample_file" {
-                            ui.set_sample_file(SharedString::from(path_str));
-                        }
-                        else if file_type.as_str() == "minknow_file" {
-                            ui.set_minknow_file(SharedString::from(path_str));
-                        }  
-                        else {
-                            ui.set_epiinfo_file(SharedString::from(path_str));
-=======
                 if let Some(file_path) = FileDialog::new().pick_file() {
                     let path_str = file_path.to_string_lossy().to_string();
                     if let Some(ui) = ui_handle.upgrade() {
@@ -153,21 +119,13 @@ fn main() {
                             "sample_file" => ui.set_sample_file(SharedString::from(path_str)),
                             "minknow_file" => ui.set_minknow_file(SharedString::from(path_str)),
                             _ => ui.set_epiinfo_file(SharedString::from(path_str)),
->>>>>>> 3e3286f (Updater checker and error handling)
                         }
                     }
                 }
             },
             "destination" => {
-<<<<<<< HEAD
-                // Directory selection dialog for output destination
                 if let Some(dir_path) = FileDialog::new().pick_folder() {
                     let path_str = dir_path.to_string_lossy().to_string();
-                    
-=======
-                if let Some(dir_path) = FileDialog::new().pick_folder() {
-                    let path_str = dir_path.to_string_lossy().to_string();
->>>>>>> 3e3286f (Updater checker and error handling)
                     if let Some(ui) = ui_handle.upgrade() {
                         ui.set_destination(SharedString::from(path_str));
                     }
@@ -182,12 +140,6 @@ fn main() {
     // CLEAR button Section
     {
         let ui_handle = ui.as_weak();
-<<<<<<< HEAD
-        
-        ui.on_clear(move ||{
-            // initialise ui 
-            let ui = ui_handle.unwrap();
-=======
         ui.on_clear(move ||{
             let ui = match ui_handle.upgrade() {
                 Some(u) => u,
@@ -196,7 +148,6 @@ fn main() {
                     return;
                 }
             };
->>>>>>> 3e3286f (Updater checker and error handling)
 
             // clear all line edits on slint side
             let empty = format!("");
@@ -222,10 +173,6 @@ fn main() {
     // end of clear button
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 3e3286f (Updater checker and error handling)
     // Merging Function
     {
     let ui_handle = ui.as_weak();
@@ -260,11 +207,7 @@ fn main() {
             return;
         }
 
-<<<<<<< HEAD
-        if !epiinfo_path.ends_with(".csv") {
-=======
         if !epiinfo_path.ends_with(".csv") && !epiinfo_missing {
->>>>>>> 3e3286f (Updater checker and error handling)
             ui.set_error_title(slint::SharedString::from("Invalid Input"));
             ui.set_error_message(slint::SharedString::from("Epi Info file selected is not a CSV file. Please change to CSV."));
             ui.set_show_error(1.0);
@@ -281,13 +224,6 @@ fn main() {
 
         // Read the HTML file
         let mut html_content = String::new();
-<<<<<<< HEAD
-        let _ = File::open(minknow_path).expect("WRONG FORMAT").read_to_string(&mut html_content);
-
-        let document = Html::parse_document(&html_content);
-
-        let script_selector: Selector = Selector::parse("script").expect("SELECTOR ERR");
-=======
         match File::open(&minknow_path) {
             Ok(mut f) => {
                 if let Err(e) = f.read_to_string(&mut html_content) {
@@ -316,7 +252,6 @@ fn main() {
                 return;
             }
         };
->>>>>>> 3e3286f (Updater checker and error handling)
 
         // Find the report data
         let mut script_tag = None;
@@ -420,12 +355,6 @@ fn main() {
     
 
         // create piranha df
-<<<<<<< HEAD
-        let mut sample_df = CsvReadOptions::default()
-            .try_into_reader_with_file_path(Some(piranha_path.into()))
-            .unwrap()
-            .finish().unwrap();
-=======
         let mut sample_df = match CsvReadOptions::default()
             .try_into_reader_with_file_path(Some(piranha_path.into())) {
                 Ok(reader) => match reader.finish() {
@@ -444,23 +373,10 @@ fn main() {
                     return;
                 }
             };
->>>>>>> 3e3286f (Updater checker and error handling)
 
         println!("{:?}", sample_df);
 
         // create epiinfo df
-<<<<<<< HEAD
-        let mut epiinfo_df = None; // set to none in case missing
-
-        if !epiinfo_missing {
-            epiinfo_df = Some(
-                CsvReadOptions::default()
-                    .try_into_reader_with_file_path(Some(epiinfo_path.into()))
-                    .unwrap()
-                    .finish()
-                    .unwrap()
-            );
-=======
         let mut epiinfo_df = None;
         if !epiinfo_missing {
             match CsvReadOptions::default()
@@ -481,7 +397,6 @@ fn main() {
                         return;
                     }
                 }
->>>>>>> 3e3286f (Updater checker and error handling)
         }
 
         //  column requirements
@@ -494,17 +409,11 @@ fn main() {
         "LibraryPreparationKit", "Well", "RunNumber", "DateSeqRunLoaded", "SequencerUsed", 
         "FlowCellVersion", "FlowCellID", "FlowCellPriorUses", "PoresAvilableAtFlowCellCheck",
         "MinKNOWSoftwareVersion","RunHoursDuration", "DateFastaGenerated", "AnalysisPipelineVersion","RunQC", "Classification",
-<<<<<<< HEAD
-        "SampleQC", "SampleQCChecksComplete", "QCComments", "DateReported",
-        ];
-
-=======
         "SampleQC", "SampleQCChecksComplete", "QCComments", "DateReported"
         ];
 
         //
 
->>>>>>> 3e3286f (Updater checker and error handling)
         // Validate headers for the sample DataFrame
         let actual_columns: Vec<String> = sample_df.get_column_names().iter().map(|s| s.to_string()).collect();
 
@@ -530,10 +439,6 @@ fn main() {
         let merged_df = match epiinfo_df {
             Some(epiinfo_df) => {
                 println!("Merging with EPI");
-<<<<<<< HEAD
-                // rename epi columns to match epi info columns
-                let sample_df = sample_df.rename("EPID", PlSmallStr::from_str("EpidNumber")).unwrap();
-=======
                 let sample_df = match sample_df.rename("EPID", PlSmallStr::from_str("EpidNumber")) {
                     Ok(df) => df,
                     Err(e) => {
@@ -543,7 +448,6 @@ fn main() {
                         return;
                     }
                 };
->>>>>>> 3e3286f (Updater checker and error handling)
                 // sample_df = sample_df.rename("CaseContactOrCommunity", PlSmallStr::from_str("CaseOrContact")).unwrap();
                 // sample_df = sample_df.rename("DateReceivedinLab", PlSmallStr::from_str("DateStoolReceivedinLab")).unwrap();
                 // sample_df = sample_df.rename("DateSampleCollected", PlSmallStr::from_str("DateStoolCollected")).unwrap();
@@ -551,38 +455,10 @@ fn main() {
                 // sample_df = sample_df.rename("DateFinalCultureResult", PlSmallStr::from_str("DateFinalCellCultureResults")).unwrap();
                 // sample_df = sample_df.rename("ITD_Result", PlSmallStr::from_str("FinalITDResult")).unwrap();
 
-<<<<<<< HEAD
-                // finding common columns, and then removing them will allow us to get those columns with data from epi info
-=======
->>>>>>> 3e3286f (Updater checker and error handling)
                 let sample_cols: std::collections::HashSet<String> = sample_df.get_column_names().iter().map(|&s| s.to_string()).collect();
                 let epi_cols: std::collections::HashSet<String> = epiinfo_df.get_column_names().iter().map(|&s| s.to_string()).collect();
                 let common_columns: Vec<String> = sample_cols.intersection(&epi_cols).cloned().collect();
 
-<<<<<<< HEAD
-                let sample_df = sample_df.drop_many(common_columns);                                           
-
-                // Merge by name
-                let mut merged_df: DataFrame = sample_df.left_join(&epiinfo_df, ["sample"], ["ICLabID"]).expect("Failed to merge dataframes");
-
-                // revert column naming for expected output
-                let merged_df = merged_df.rename("EpidNumber", PlSmallStr::from_str("EPID")).unwrap();
-                // merged_df = merged_df.rename("CaseOrContact", PlSmallStr::from_str("CaseContactOrCommunity")).unwrap();
-                // merged_df = merged_df.rename("DateStoolReceivedinLab", PlSmallStr::from_str("DateReceivedinLab")).unwrap();
-                // merged_df = merged_df.rename("DateStoolCollected", PlSmallStr::from_str("DateSampleCollected")).unwrap();
-                // merged_df = merged_df.rename("FinalCellCultureResult", PlSmallStr::from_str("CultureResult")).unwrap();
-                // merged_df = merged_df.rename("DateFinalCellCultureResults", PlSmallStr::from_str("DateFinalCultureResult")).unwrap();
-                // merged_df = merged_df.rename("FinalITDResult", PlSmallStr::from_str("ITD_Result")).unwrap();
-
-                println!("completed epi / sample mode");
-                merged_df.select(expected_columns).unwrap()
-            }
-            None => {
-                // Since Epi Info is missing, the columns did not need to be changed nor did a merge occur
-                // simply set sample_df to merged_df resulting in empty epi info columns
-                println!("completed epi skip mode");
-                sample_df.select(expected_columns).unwrap()
-=======
                 let sample_df = sample_df.drop_many(common_columns);
 
                 let mut merged_df = match sample_df.left_join(&epiinfo_df, ["sample"], ["ICLabID"]) {
@@ -627,7 +503,6 @@ fn main() {
                         return;
                     }
                 }
->>>>>>> 3e3286f (Updater checker and error handling)
             }
         };
 
@@ -718,45 +593,6 @@ fn main() {
             }
 
             // Fill in run constant values
-<<<<<<< HEAD
-            let merged_df: DataFrame = merged_df.clone().lazy()
-                                        .with_columns([
-                                            col("institute").fill_null(lit(ui.get_lab().as_str())),
-                                            col("RunNumber").fill_null(lit(ui.get_run_num().as_str())),
-                                            col("MinKNOWSoftwareVersion").fill_null(lit(ui.get_minknow_ver().as_str())),
-                                            col("AnalysisPipelineVersion").fill_null(lit(ui.get_pir_ver().as_str())),
-                                            col("DateRTPCR").fill_null(lit(ui.get_rt_date().as_str())),
-                                            col("DateVP1PCR").fill_null(lit(ui.get_vp1_date().as_str())),
-                                            col("RTPCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
-                                            col("VP1PCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
-                                            col("PositiveControlPCRCheck").cast(DataType::String).fill_null(lit(pos_con)),
-                                            col("NegativeControlPCRCheck").cast(DataType::String).fill_null(lit(neg_con)),
-                                            col("LibraryPreparationKit").fill_null(lit(ui.get_seq_kit().as_str())),
-                                            col("DateSeqRunLoaded").fill_null(lit(ui.get_seq_date().as_str())),
-                                            col("FlowCellID").fill_null(lit(ui.get_fc_id().as_str())),
-                                            col("FlowCellPriorUses").fill_null(lit(ui.get_fc_uses().as_str())),
-                                            col("PoresAvilableAtFlowCellCheck").fill_null(lit(ui.get_fc_pores().as_str())),
-                                            col("RunHoursDuration").fill_null(lit(ui.get_seq_hours().as_str())),
-                                            col("DateFastaGenerated").fill_null(lit(ui.get_fasta_date().as_str())),
-                                        ]).collect().unwrap();
-            println!("{:?}", merged_df);
-            merged_df.select(expected_columns).unwrap()
-            
-            }
-
-            // update mode won't read run constant and change, will leave what was read in
-            _ =>{
-                println!("UPDATE MODE");
-                merged_df.select(expected_columns).unwrap()
-            }
-        };
-
-        // saving to destionation
-        let file_name = format!("{}_merger_output.csv", ui.get_run_num().as_str());
-        let file_path = format!("{destination_path}/{file_name}");
-        let mut file = std::fs::File::create(file_path).unwrap();
-        CsvWriter::new(&mut file).finish(&mut merged_df).unwrap();
-=======
             let merged_df: DataFrame = match merged_df.clone().lazy()
                 .with_columns([
                     col("institute").fill_null(lit(ui.get_lab().as_str())),
@@ -828,7 +664,6 @@ fn main() {
             ui.set_show_error(1.0);
             return;
         }
->>>>>>> 3e3286f (Updater checker and error handling)
 
         println!("{:?}", merged_df);
         
@@ -836,11 +671,7 @@ fn main() {
         match mode {
             "merge" => {
                 println!("MERGE MSG");
-<<<<<<< HEAD
-                ui.set_info_title(slint::SharedString::from("Merge Succesful"));
-=======
                 ui.set_info_title(slint::SharedString::from("Merge Successful"));
->>>>>>> 3e3286f (Updater checker and error handling)
                 ui.set_info_message(slint::SharedString::from(format!("Merged Detailed Run Report saved to destination as {file_name}.")));
                 ui.set_show_info(1.0);
             }
@@ -866,61 +697,6 @@ fn main() {
     {
         ui.on_template( move || {
             if let Some(ui) = ui_handle.upgrade(){
-<<<<<<< HEAD
-            // file path
-            let file_path = dirs::download_dir().expect("No Downloads folder found").join("sample_template.csv");
-
-            let mut df = df![
-            "sample" => Vec::<String>::new(),
-            "barcode" => Vec::<String>::new(),
-            "IsQCRetest" => Vec::<String>::new(),
-            "IfRetestOriginalRun" => Vec::<String>::new(),
-            "EPID" => Vec::<String>::new(),
-            "institute" => Vec::<String>::new(),
-            "SampleType" => Vec::<String>::new(),
-            "CaseOrContact" => Vec::<String>::new(),
-            "Country" => Vec::<String>::new(),
-            "Province" => Vec::<String>::new(),
-            "District" => Vec::<String>::new(),
-            "StoolCondition" => Vec::<String>::new(),
-            "SpecimenNumber" => Vec::<String>::new(),
-            "DateOfOnset" => Vec::<String>::new(),
-            "DateStoolCollected" => Vec::<String>::new(),
-            "DateStoolReceivedinLab" => Vec::<String>::new(),
-            "DateRNAextraction" => Vec::<String>::new(),
-            "DateRTPCR" => Vec::<String>::new(),
-            "RTPCRMachine" => Vec::<String>::new(),
-            "RTPCRprimers" => Vec::<String>::new(),
-            "DateVP1PCR" => Vec::<String>::new(),
-            "VP1PCRMachine" => Vec::<String>::new(),
-            "VP1primers" => Vec::<String>::new(),
-            "PositiveControlPCRCheck" => Vec::<String>::new(),
-            "NegativeControlPCRCheck" => Vec::<String>::new(),
-            "LibraryPreparationKit" => Vec::<String>::new(),
-            "Well" => Vec::<String>::new(),
-            "RunNumber" => Vec::<String>::new(),
-            "DateSeqRunLoaded" => Vec::<String>::new(),
-            "SequencerUsed" => Vec::<String>::new(),
-            "FlowCellVersion" => Vec::<String>::new(),
-            "FlowCellID" => Vec::<String>::new(),
-            "FlowCellPriorUses" => Vec::<String>::new(),
-            "PoresAvilableAtFlowCellCheck" => Vec::<String>::new(),
-            "MinKNOWSoftwareVersion" => Vec::<String>::new(),
-            "RunHoursDuration" => Vec::<String>::new(),
-            "DateFastaGenerated" => Vec::<String>::new(),
-            "AnalysisPipelineVersion" => Vec::<String>::new(),
-            "RunQC" => Vec::<String>::new(),
-            "Classification" => Vec::<String>::new(),
-            "SampleQC" => Vec::<String>::new(),
-            "SampleQCChecksComplete" => Vec::<String>::new(),
-            "QCComments" => Vec::<String>::new(),
-            "DateReported" => Vec::<String>::new()
-            ].unwrap();
-
-            // output to downloads
-            let file = std::fs::File::create(file_path).unwrap();
-            CsvWriter::new(file).finish(&mut df).unwrap();
-=======
             let file_path = match dirs::download_dir() {
                 Some(dir) => dir.join("sample_template.csv"),
                 None => {
@@ -1001,7 +777,6 @@ fn main() {
                 ui.set_show_error(1.0);
                 return;
             }
->>>>>>> 3e3286f (Updater checker and error handling)
 
             // success message
             ui.set_info_title(slint::SharedString::from("Template saved"));
