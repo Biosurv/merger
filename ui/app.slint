@@ -22,15 +22,9 @@ export component ErrorBox {
         width: 600px;
         height: 300px;
         border-radius: 10px;
-<<<<<<< HEAD
-        background: white;
-        border-width: 1px;
-        border-color:#000000;
-=======
         background: #ffd79cff;
         border-width: 1px;
         border-color: black;
->>>>>>> 3e3286f (Updater checker and error handling)
         padding: 10px;
         z: 1000;
         opacity: root.state;
@@ -39,11 +33,7 @@ export component ErrorBox {
             border-color: black;
             border-width: 1px;
             border-radius: 0px;
-<<<<<<< HEAD
-            background: #f8d7da;
-=======
             background: #e4513dff;
->>>>>>> 3e3286f (Updater checker and error handling)
             width: 600px;
             height: 35px;
             y: 0px;
@@ -59,11 +49,7 @@ export component ErrorBox {
         Text {
             text: message;
             font-size: 14px;
-<<<<<<< HEAD
-            color: #721c24;
-=======
             color: black;
->>>>>>> 3e3286f (Updater checker and error handling)
             wrap: word-wrap;
             width: 580px;
             vertical-alignment: center;
@@ -86,37 +72,6 @@ export component InfoBox {
     in property<string> message;
     in-out property<float> state;
 
-<<<<<<< HEAD
-    Rectangle {
-        width: 300px;
-        height: 130px;
-        border-radius: 10px;
-        background: white;
-        border-width: 1px;
-        border-color:#000000;
-        padding: 10px;
-        z: 1000;
-        opacity: root.state;
-
-        Rectangle {
-            border-color: black;
-            border-width: 1px;
-            border-radius: 0px;
-            background: #cabcbc;
-            width: 300px;
-            height: 35px;
-            y: 0px;
-
-        Text {
-            text: title;
-            font-size: 16px;
-            color: black;
-            horizontal-alignment: center;
-            y: 10px;
-        }}
-
-        Text {
-=======
     // tweakables
     in property<length> pad: 10px;
     in property<length> body_width: 280px;
@@ -162,24 +117,10 @@ export component InfoBox {
 
         // body text (wrapped)
         body_text := Text {
->>>>>>> 3e3286f (Updater checker and error handling)
             text: message;
             font-size: 14px;
             color: #000000;
             wrap: word-wrap;
-<<<<<<< HEAD
-            width: 280px;
-            vertical-alignment: center;
-            horizontal-alignment: center;
-            y: 50px;
-        }
-
-        Button {
-            text: "Close";
-            width: 80px;
-            height: 30px;
-            y: 95px;
-=======
             width: body_width;          // defines wrapping
             x: pad;
             y: header_h + gap + pad;    // sits below header
@@ -192,7 +133,6 @@ export component InfoBox {
             height: button_h;
             x: (parent.width - self.width) / 2; // center horizontally
             y: header_h + gap + pad + body_text.height + gap;
->>>>>>> 3e3286f (Updater checker and error handling)
             clicked => { root.state = 0.0; }
         }
     }
@@ -274,10 +214,7 @@ export component Guide {
 
 
 export component AppWindow inherits Window {
-<<<<<<< HEAD
-=======
     title: "Merger";
->>>>>>> 3e3286f (Updater checker and error handling)
     width: 1270px;
     height: 390px;
     
@@ -332,19 +269,11 @@ export component AppWindow inherits Window {
     callback update();
     callback template();
 
-<<<<<<< HEAD
-    // Rectangle {background:@linear-gradient(180deg, #fce0b0 0%, #f7ae6c 50%, #ed6d37 75%, #e73c25 100%);
-    //     border-color: black; border-radius: 10px; border-width: 1px; padding: 8px;
-
-    // gradient background
-    Rectangle {background: @linear-gradient(180deg, #fce0b0 85%, #e73c25 100%);
-=======
     // Rectangle {background:@linear-gradient(180deg, #fce0b0 0%, #fc8e2eff 50%, #ed6d37 75%, #e73c25 100%);
     //     border-color: black; border-radius: 10px; border-width: 1px; padding: 8px;
 
     // gradient background
     Rectangle {background: @linear-gradient(180deg, #ffcb7dff 0%, #ffbe69ff 75%, #e4513dff 100%);
->>>>>>> 3e3286f (Updater checker and error handling)
     border-color: black;border-width: 2px;
     }
 
