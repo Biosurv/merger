@@ -23,7 +23,7 @@ The app generates the `[Run Number]_barcodes.csv` at your chosen destination con
 - Run consistent details such as PCR machine, run number, Piranha version etc
 - Run consistent details pulled from MinKNOW report such as MinKNOW software version, pores available, Flowcell ID etc
 
-### General use
+## General use
 1. **Insert Run details**
    - The panel at the top contains input boxes for various fields that remain consistent for each sample in a run. Where a format is present in the box (e.g YYYYMMDD_XXX), inputs must match the format specified.
 
