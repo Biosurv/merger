@@ -7,17 +7,16 @@ use polars::prelude::*;
 use slint::SharedString;
 use dirs;
 use regex::Regex;
-//use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use scraper::{Html, Selector};
 use serde_json::Value;
 use update_checker::UpdateChecker;
-//use std::error::Error;
 
 /*
     Version: 1.0.0
-    Date: 2025-02-13
+    Date: 2025-10-22
+    Authors: Shean Mobed, Matthew Anderson
     Description:
     This is the rust version of the merger app. This app will take three files:
     - a barcodes CSV file with two columns sample and barcode.
@@ -44,10 +43,10 @@ fn main() {
     
     let mut checker = UpdateChecker::new(
         "Biosurv",       
-        "RunReporter",
+        "merger",
         env!("CARGO_PKG_VERSION"), // current app version
     )
-    .with_settings_namespace("Biosurv", "RunReporter");
+    .with_settings_namespace("Biosurv", "merger");
 
     let _ = checker.clear_cache();
 
@@ -99,14 +98,6 @@ fn main() {
     // File Selection Function
     {
     let ui_handle = ui.as_weak();
-
-    // for testing
-    if let Some(ui) = ui_handle.upgrade() {
-        ui.set_minknow_file(SharedString::from("C:\\Users\\MatthewAnderson\\Desktop\\Polio\\examples\\20250206_005_report_FBA38845_20250206_1539_74ce1900.html"));
-        ui.set_sample_file(SharedString::from("C:\\Users\\MatthewAnderson\\Desktop\\Polio\\examples\\samples.csv"));
-        ui.set_epiinfo_file(SharedString::from("C:\\Users\\MatthewAnderson\\Desktop\\Polio\\examples\\epiinfo_master.csv"));
-        ui.set_destination(SharedString::from("C:\\Users\\MatthewAnderson\\Desktop\\Polio\\examples"));
-    }
 
 
     ui.on_select_file(move |file_type: SharedString| {
@@ -163,6 +154,10 @@ fn main() {
             ui.set_fc_id(slint::SharedString::from(empty.clone()));
             ui.set_fc_pores(slint::SharedString::from(empty.clone()));
             ui.set_fc_uses(slint::SharedString::from(empty.clone()));
+            ui.set_rtpcr_primers(slint::SharedString::from(empty.clone()));
+            ui.set_pcr_machine(slint::SharedString::from(empty.clone()));
+            ui.set_vp1_pcr_machine(slint::SharedString::from(empty.clone()));
+            ui.set_vp1_primers(slint::SharedString::from(empty.clone()));
 
             ui.set_minknow_file(slint::SharedString::from(empty.clone()));
             ui.set_sample_file(slint::SharedString::from(empty.clone()));
@@ -412,7 +407,6 @@ fn main() {
         "SampleQC", "SampleQCChecksComplete", "QCComments", "DateReported"
         ];
 
-        //
 
         // Validate headers for the sample DataFrame
         let actual_columns: Vec<String> = sample_df.get_column_names().iter().map(|s| s.to_string()).collect();
@@ -448,12 +442,7 @@ fn main() {
                         return;
                     }
                 };
-                // sample_df = sample_df.rename("CaseContactOrCommunity", PlSmallStr::from_str("CaseOrContact")).unwrap();
-                // sample_df = sample_df.rename("DateReceivedinLab", PlSmallStr::from_str("DateStoolReceivedinLab")).unwrap();
-                // sample_df = sample_df.rename("DateSampleCollected", PlSmallStr::from_str("DateStoolCollected")).unwrap();
-                // sample_df = sample_df.rename("CultureResult", PlSmallStr::from_str("FinalCellCultureResult")).unwrap();
-                // sample_df = sample_df.rename("DateFinalCultureResult", PlSmallStr::from_str("DateFinalCellCultureResults")).unwrap();
-                // sample_df = sample_df.rename("ITD_Result", PlSmallStr::from_str("FinalITDResult")).unwrap();
+                
 
                 let sample_cols: std::collections::HashSet<String> = sample_df.get_column_names().iter().map(|&s| s.to_string()).collect();
                 let epi_cols: std::collections::HashSet<String> = epiinfo_df.get_column_names().iter().map(|&s| s.to_string()).collect();
@@ -531,12 +520,6 @@ fn main() {
             
             if !run_num.is_empty() && !run_num_regex.is_match(run_num.as_str()) {
                     run_num_err = format!("\n\nInvalid run number format: {run_num} \nExpected yyyymmdd_xxx.");
-                
-                    // ui.set_error_title(slint::SharedString::from("Run Number Format Error"));
-                    // ui.set_error_message(slint::SharedString::from(run_num_err));
-                    // ui.set_show_error(1.0);
-                    // println!("Exit on run number format error");
-                    // return;
             }
 
             // Date format check
@@ -581,7 +564,7 @@ fn main() {
                 }
 
                 let joint_date_errors = date_errors.join("\n\n");
-                //let combined_error = format!("{joint_date_errors}");
+                
                 
                 let format_err = format!("\n{joint_date_errors} \n {run_num_err} \n\n Refer to the Guide for more information.");
 
@@ -602,7 +585,7 @@ fn main() {
                     col("DateRTPCR").fill_null(lit(ui.get_rt_date().as_str())),
                     col("DateVP1PCR").fill_null(lit(ui.get_vp1_date().as_str())),
                     col("RTPCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
-                    col("VP1PCRMachine").fill_null(lit(ui.get_pcr_machine().as_str())),
+                    col("VP1PCRMachine").fill_null(lit(ui.get_vp1_pcr_machine().as_str())),
                     col("PositiveControlPCRCheck").cast(DataType::String).fill_null(lit(pos_con)),
                     col("NegativeControlPCRCheck").cast(DataType::String).fill_null(lit(neg_con)),
                     col("LibraryPreparationKit").fill_null(lit(ui.get_seq_kit().as_str())),
@@ -612,6 +595,8 @@ fn main() {
                     col("PoresAvilableAtFlowCellCheck").fill_null(lit(ui.get_fc_pores().as_str())),
                     col("RunHoursDuration").fill_null(lit(ui.get_seq_hours().as_str())),
                     col("DateFastaGenerated").fill_null(lit(ui.get_fasta_date().as_str())),
+                    col("RTPCRprimers").fill_null(lit(ui.get_rtpcr_primers().as_str())),
+                    col("VP1primers").fill_null(lit(ui.get_vp1_primers().as_str()))
                 ]).collect() {
                     Ok(df) => df,
                     Err(e) => {
