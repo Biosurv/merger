@@ -39,7 +39,7 @@ fn main() {
             return;
         }
     };
-
+    
     
     let mut checker = UpdateChecker::new(
         "Biosurv",       
