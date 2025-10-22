@@ -13,11 +13,10 @@ regex = "1.11.1"
 scraper = "0.17"
 serde_json = "1.0"
 caseless = "0.2"
-
-# depend on the local lib by its package name
 update-checker = { package = "update-checker", path = "updateChecker", features = ["slint"] }
 
 [build-dependencies]
 winres = "0.1"
 slint-build = "1.8.0"
+
 
