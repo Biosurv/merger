@@ -397,13 +397,13 @@ fn main() {
         //  column requirements
         let expected_columns = [
         "sample", "barcode", "IsQCRetest", "IfRetestOriginalRun", "EPID",
-        "institute", "SampleType", "CaseOrContact", "Country", "Province", "District", "StoolCondition",
+        "SampleType", "CaseOrContact", "Country", "Province", "District", "StoolCondition",
         "SpecimenNumber", "DateOfOnset", "DateStoolCollected", "DateStoolReceivedinLab", "DateStoolsuspension",
         "DateRNAextraction", "DateRTPCR", "RTPCRMachine", "RTPCRprimers","DateVP1PCR", "VP1PCRMachine",
         "VP1primers", "PositiveControlPCRCheck", "NegativeControlPCRCheck",
         "LibraryPreparationKit", "Well", "RunNumber", "DateSeqRunLoaded", "SequencerUsed", 
         "FlowCellVersion", "FlowCellID", "FlowCellPriorUses", "PoresAvilableAtFlowCellCheck",
-        "MinKNOWSoftwareVersion","RunHoursDuration", "DateFastaGenerated", "AnalysisPipelineVersion","RunQC", "Classification",
+        "MinKNOWSoftwareVersion","RunHoursDuration", "DateFastaGenerated", "AnalysisPipelineVersion","RunQC", "DDNSclassification",
         "SampleQC", "SampleQCChecksComplete", "QCComments", "DateReported"
         ];
 
@@ -578,7 +578,6 @@ fn main() {
             // Fill in run constant values
             let merged_df: DataFrame = match merged_df.clone().lazy()
                 .with_columns([
-                    col("institute").fill_null(lit(ui.get_lab().as_str())),
                     col("RunNumber").fill_null(lit(ui.get_run_num().as_str())),
                     col("MinKNOWSoftwareVersion").fill_null(lit(ui.get_minknow_ver().as_str())),
                     col("AnalysisPipelineVersion").fill_null(lit(ui.get_pir_ver().as_str())),
@@ -698,7 +697,6 @@ fn main() {
                 "IsQCRetest" => Vec::<String>::new(),
                 "IfRetestOriginalRun" => Vec::<String>::new(),
                 "EPID" => Vec::<String>::new(),
-                "institute" => Vec::<String>::new(),
                 "SampleType" => Vec::<String>::new(),
                 "CaseOrContact" => Vec::<String>::new(),
                 "Country" => Vec::<String>::new(),
@@ -732,7 +730,7 @@ fn main() {
                 "DateFastaGenerated" => Vec::<String>::new(),
                 "AnalysisPipelineVersion" => Vec::<String>::new(),
                 "RunQC" => Vec::<String>::new(),
-                "Classification" => Vec::<String>::new(),
+                "DDNSclassification" => Vec::<String>::new(),
                 "SampleQC" => Vec::<String>::new(),
                 "SampleQCChecksComplete" => Vec::<String>::new(),
                 "QCComments" => Vec::<String>::new(),
