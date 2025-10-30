@@ -14,8 +14,8 @@ use serde_json::Value;
 use update_checker::UpdateChecker;
 
 /*
-    Version: 1.0.0
-    Date: 2025-10-22
+    Version: 1.0.1
+    Date: 2025-10-30
     Authors: Shean Mobed, Matthew Anderson
     Description:
     This is the rust version of the merger app. This app will take three files:
