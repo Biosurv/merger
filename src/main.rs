@@ -398,7 +398,7 @@ fn main() {
         let expected_columns = [
         "sample", "barcode", "IsQCRetest", "IfRetestOriginalRun", "EPID",
         "institute", "SampleType", "CaseOrContact", "Country", "Province", "District", "StoolCondition",
-        "SpecimenNumber", "DateOfOnset", "DateStoolCollected", "DateStoolReceivedinLab",
+        "SpecimenNumber", "DateOfOnset", "DateStoolCollected", "DateStoolReceivedinLab", "DateStoolsuspension",
         "DateRNAextraction", "DateRTPCR", "RTPCRMachine", "RTPCRprimers","DateVP1PCR", "VP1PCRMachine",
         "VP1primers", "PositiveControlPCRCheck", "NegativeControlPCRCheck",
         "LibraryPreparationKit", "Well", "RunNumber", "DateSeqRunLoaded", "SequencerUsed", 
