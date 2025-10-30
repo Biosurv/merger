@@ -707,6 +707,7 @@ fn main() {
                 "DateOfOnset" => Vec::<String>::new(),
                 "DateStoolCollected" => Vec::<String>::new(),
                 "DateStoolReceivedinLab" => Vec::<String>::new(),
+                "DateStoolsuspension" => Vec::<String>::new(),
                 "DateRNAextraction" => Vec::<String>::new(),
                 "DateRTPCR" => Vec::<String>::new(),
                 "RTPCRMachine" => Vec::<String>::new(),
