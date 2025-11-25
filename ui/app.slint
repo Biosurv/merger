@@ -80,13 +80,14 @@ export component ErrorBox {
             height: 35px;
             y: 0px;
 
-        Text {
-            text: title;
-            font-size: 16px;
-            color: black;
-            horizontal-alignment: center;
-            y: 10px;
-        }}
+            Text {
+                text: title;
+                font-size: 16px;
+                color: black;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
 
         Text {
             text: message;
@@ -94,16 +95,17 @@ export component ErrorBox {
             color: black;
             wrap: word-wrap;
             width: 580px;
-            vertical-alignment: center;
             horizontal-alignment: center;
-            y: 50px;
+            vertical-alignment: center;
+            y: 60px;
         }
 
         Button {
             text: "Close";
             width: 80px;
             height: 30px;
-            y: 260px;
+            x: (parent.width - self.width) / 2;
+            y: parent.height - self.height - 10px;
             clicked => { root.state = 0.0; }
         }
     }
@@ -114,14 +116,12 @@ export component InfoBox {
     in property<string> message;
     in-out property<float> state;
 
-    // tweakables
     in property<length> pad: 10px;
     in property<length> body_width: 280px;
     in property<length> header_h: 35px;
     in property<length> button_h: 30px;
     in property<length> gap: 10px;
 
-    // derived sizes
     private property<length> outer_w: body_width + 2 * pad;
     private property<length> natural_h:
         header_h + gap + body_text.height + gap + button_h + 2 * pad;
@@ -137,7 +137,6 @@ export component InfoBox {
         z: 1000;
         opacity: root.state;
 
-        // header
         Rectangle {
             width: parent.width;
             height: header_h;
@@ -153,27 +152,24 @@ export component InfoBox {
                 color: black;
                 horizontal-alignment: center;
                 vertical-alignment: center;
-                // no hard-coded y; it centers in the header
             }
         }
 
-        // body text (wrapped)
         body_text := Text {
             text: message;
             font-size: 14px;
             color: #000000;
             wrap: word-wrap;
-            width: body_width;          // defines wrapping
+            width: body_width;
             x: pad;
-            y: header_h + gap + pad;    // sits below header
+            y: header_h + gap + pad;
         }
 
-        // Close button under the text
         Button {
             text: "Close";
             width: 80px;
             height: button_h;
-            x: (parent.width - self.width) / 2; // center horizontally
+            x: (parent.width - self.width) / 2;
             y: header_h + gap + pad + body_text.height + gap;
             clicked => { root.state = 0.0; }
         }
@@ -200,7 +196,6 @@ export component GuideOverlay {
             border-width: 1px;
             border-color:#000000;
 
-            // typography + column widths
             private property<length> hdr_fs:   16px;
             private property<length> label_fs: 13px;
             private property<length> body_fs:  12px;
@@ -217,7 +212,6 @@ export component GuideOverlay {
                 Text { text: "Guide"; font-weight: 700; font-size: panel.hdr_fs; color: black; }
                 Rectangle { height: 1px; background: #000000; }
 
-                // Scrollable area
                 ScrollView {
                     vertical-stretch: 1;
                     horizontal-stretch: 1;
@@ -225,77 +219,68 @@ export component GuideOverlay {
                     viewport := VerticalLayout {
                         spacing: 14px;
 
-                       
                         HorizontalLayout {
                             spacing: 24px;
 
-                            // LEFT INPUT COLUMN
                             GridLayout { spacing: 14px;
-                                Text { text: "Laboratory";       width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
+                                Text { text: "Laboratory"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
                                 Text { text: "Organisation or institute that performed the run."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 0; }
 
-                                Text { text: "Run Number";       width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
+                                Text { text: "Run Number"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
                                 Text { text: "Unique number with format: YYYYMMDD_XXX. Where YYYYMMDD is run date and XXX is the incremental run number of the year, e.g. 012."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 1; }
 
-                                Text { text: "Piranha Version";  width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 2; vertical-alignment: top; }
+                                Text { text: "Piranha Version"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 2; vertical-alignment: top; }
                                 Text { text: "Version number can be found on the first page of the app when launched. Please keep Piranha up to date. Example: 1.3.1"; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 2; }
 
-                                Text { text: "RTPCR primers";    width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 3; vertical-alignment: top; }
+                                Text { text: "RTPCR primers"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 3; vertical-alignment: top; }
                                 Text { text: "Primers used for RT-PCR step."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 3; }
 
-                                Text { text: "VP1 primers";      width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 4; vertical-alignment: top; }
+                                Text { text: "VP1 primers"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 4; vertical-alignment: top; }
                                 Text { text: "Primers used for VP1 PCR step."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 4; }
-
                             }
-                            // RIGHT INPUT COLUMN
+
                             GridLayout { spacing: 14px;
-                                Text { text: "Date RT";            width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
+                                Text { text: "Date RT"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
                                 Text { text: "Date RT-PCR was performed. Please use YYYY-MM-DD format. Example: 2024-11-14"; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 0; }
 
-                                Text { text: "Date VP1";           width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
+                                Text { text: "Date VP1"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
                                 Text { text: "Date VP1 PCR was performed. Please use YYYY-MM-DD format."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 1; }
 
-                                Text { text: "RT/VP1 PCR Machine";        width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 2; vertical-alignment: top; }
+                                Text { text: "RT/VP1 PCR Machine"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 2; vertical-alignment: top; }
                                 Text { text: "Brand and model of machine used for both PCRs. Example: Biorad CFX"; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 2; }
 
-                                Text { text: "FlowCell Prior Uses";width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 3; vertical-alignment: top; }
+                                Text { text: "FlowCell Prior Uses"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 3; vertical-alignment: top; }
                                 Text { text: "If it is a new cell, put 0. If the cell has been used before, put 1. Example: 1"; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 3; }
-
                             }
                         }
 
-                        
                         Rectangle { height: 1px; background: #00000066; }
 
-                       
                         HorizontalLayout {
                             spacing: 24px;
 
-                            // LEFT BUTTON COLUMN (3)
                             GridLayout { spacing: 14px;
-                                Text { text: "Merge Button:";    width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
+                                Text { text: "Merge Button:"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
                                 Text { text: "This will join both samples and EpiInfo information and add Run Information to the output detailed run report in the destination."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 0; }
 
                                 Text { text: "Template Button:"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
                                 Text { text: "This will save a template of the sample file in the downloads folder."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 1; }
 
-                                Text { text: "Guide Button:";    width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 2; vertical-alignment: top; }
+                                Text { text: "Guide Button:"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 2; vertical-alignment: top; }
                                 Text { text: "This will display this guide."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 2; }
                             }
 
-                            // RIGHT BUTTON COLUMN (2)
                             GridLayout { spacing: 14px;
-                                Text { text: "Update Button:";  width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
+                                Text { text: "Update Button:"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 0; vertical-alignment: top; }
                                 Text { text: "This will update the EpiInfo of a detailed run report with the supplied epiinfo. The user doesn't need to fill in run information again."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 0; }
 
-                                Text { text: "Clear Button:";    width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
+                                Text { text: "Clear Button:"; width: panel.label_w; font-size: panel.label_fs; font-weight: 500; color: black; col: 0; row: 1; vertical-alignment: top; }
                                 Text { text: "This will clear all inputted information."; width: panel.desc_w; font-size: panel.body_fs; wrap: word-wrap; color: black; col: 1; row: 1; }
                             }
                         }
                     }
                 }
 
-                // Close button
                 HorizontalLayout {
                     spacing: 0px;
                     Rectangle { horizontal-stretch: 1; background: transparent; }
@@ -309,10 +294,11 @@ export component GuideOverlay {
 
 export component AppWindow inherits Window {
     title: "Merger";
-    // Fixed size window (no resizing)
     width: 1260px;
     height: 540px;
     icon: @image-url("psc_logo.png");
+
+    in-out property <string> mode: "DDNS";
 
     // file paths
     in-out property <string> sample_file;
@@ -330,12 +316,12 @@ export component AppWindow inherits Window {
     in-out property <string> pos_con <=> pos_box.current-value;
     in-out property <string> neg_con <=> neg_box.current-value;
 
-    // PCR info
+    // PCR / dates
     in-out property <string> rt_date;
     in-out property <string> pcr_machine;
     in-out property <string> vp1_date;
 
-    // EXTRA fields
+    // EXTRA fields (DDNS only)
     in-out property <string> rtpcr_primers;
     in-out property <string> vp1_pcr_machine;
     in-out property <string> vp1_primers;
@@ -365,28 +351,34 @@ export component AppWindow inherits Window {
     callback update();
     callback template();
 
-    // background
     Rectangle {
         background: @linear-gradient(180deg, #ffcb7dff 0%, #ffbe69ff 75%, #e4513dff 100%);
         border-color: black;
         border-width: 2px;
     }
 
-    // OUTER LAYOUT
     VerticalLayout {
         spacing: 12px;
         padding: 14px;
 
-        // Header row (Version at top-right)
         HorizontalLayout {
             spacing: 10px;
 
             Image { source: @image-url("psc_logo.png"); height: 36px; width: 36px; vertical-alignment: center; }
             Text { text: "Merger"; font-size: 28px; color: black; vertical-alignment: center; font-weight: 700; }
 
-            Rectangle { horizontal-stretch: 1; background: transparent; } // spacer
+            Rectangle { horizontal-stretch: 1; background: transparent; }
 
-            Text { text: "Version 1.0.1"; color: #000000cc; vertical-alignment: center; }
+            Text { text: "Mode:"; vertical-alignment: center; color: black; }
+            ComboBox {
+            model: ["DDNS", "minION"];
+            current-value <=> root.mode;
+            width: 120px; height: 30px;
+        }
+
+            Rectangle { width: 12px; background: transparent; }
+
+            Text { text: "Version 1.1.0"; color: #000000cc; vertical-alignment: center; }
         }
 
         // RUN DETAILS
@@ -399,15 +391,17 @@ export component AppWindow inherits Window {
                 // row 1
                 GridLineEdit { label: "Laboratory";         text <=> root.lab;               row: 0; col: 0; }
                 GridLineEdit { label: "Run Number";         text <=> root.run_num; yyyymmdd: "YYYYMMDD_XXX"; row: 0; col: 1; }
-                GridLineEdit { label: "Piranha Version";     text <=> root.pir_ver;           row: 0; col: 2; }
+                GridLineEdit { label: "Piranha Version";    text <=> root.pir_ver;           row: 0; col: 2; }
 
                 // row 2
-                GridLineEdit { label: "RT Date";             text <=> root.rt_date; yyyymmdd: "YYYY-MM-DD";   row: 1; col: 0; }
-                GridLineEdit { label: "VP1 Date";            text <=> root.vp1_date; yyyymmdd: "YYYY-MM-DD";  row: 1; col: 1; }
-                GridLineEdit { label: "RTPCR Machine";       text <=> root.pcr_machine;        row: 1; col: 2; }
-                GridLineEdit { label: "VP1 PCR Machine";     text <=> root.vp1_pcr_machine;    row: 1; col: 3; }
+                GridLineEdit { label: "RT Date";            text <=> root.rt_date; yyyymmdd: "YYYY-MM-DD";   row: 1; col: 0; }
 
-                // row 3 — PCR control dropdowns
+                // DDNS-only inputs
+                GridLineEdit { label: "VP1 Date";            text <=> root.vp1_date;        yyyymmdd: "YYYY-MM-DD"; row: 1; col: 1; visible: root.mode == "DDNS"; }
+                GridLineEdit { label: "RTPCR Machine";       text <=> root.pcr_machine;     row: 1; col: 2; visible: root.mode == "DDNS"; }
+                GridLineEdit { label: "VP1 PCR Machine";     text <=> root.vp1_pcr_machine; row: 1; col: 3; visible: root.mode == "DDNS"; }
+
+                // PCR Control
                 HorizontalLayout {
                     row: 2; col: 0; colspan: 4; spacing: 8px;
 
@@ -437,10 +431,14 @@ export component AppWindow inherits Window {
                     Rectangle { horizontal-stretch: 1; background: transparent; }
                 }
 
-                // row 4
-                GridLineEdit { label: "RTPCR Primers";       text <=> root.rtpcr_primers;     row: 3; col: 0; }
-                GridLineEdit { label: "VP1 Primers";         text <=> root.vp1_primers;       row: 3; col: 1; }
-                GridLineEdit { label: "FlowCell Prior Use";  text <=> root.fc_uses;           row: 3; col: 2; }
+                // Extra DDNS-only fields row
+                GridLineEdit { label: "RTPCR Primers";       text <=> root.rtpcr_primers;     row: 3; col: 0; visible: root.mode == "DDNS"; }
+                GridLineEdit { label: "VP1 Primers";         text <=> root.vp1_primers;       row: 3; col: 1; visible: root.mode == "DDNS"; }
+
+                // FlowCell Prior Use
+                GridLineEdit { label: "FlowCell Prior Use";  text <=> root.fc_uses;           row: 3; col: 2; visible: root.mode == "DDNS"; }
+                GridLineEdit { label: "FlowCell Prior Use";  text <=> root.fc_uses;           row: 3; col: 0; visible: root.mode == "minION"; }
+
             }
         }
 
@@ -483,7 +481,7 @@ export component AppWindow inherits Window {
             Button { text: "Clear";    width: 96px; height: 34px; clicked => { clear() } }
             Button { text: "Template"; width: 96px; height: 34px; clicked => { template() } }
 
-            Rectangle { horizontal-stretch: 1; background: transparent; }  // pushes Guide to the far right
+            Rectangle { horizontal-stretch: 1; background: transparent; }
 
             Button { text: "Guide";    width: 96px; height: 34px; clicked => { root.show_guide = 1.0 } }
         }
