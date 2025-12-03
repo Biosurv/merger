@@ -15,21 +15,9 @@ use serde_json::Value;
 use update_checker::UpdateChecker;
 
 /*
-    Version: 1.1.0
+    Version: 1.1.1
     Date: 2025-10-30
     Authors: Shean Mobed, Matthew Anderson
-    Description:
-    This is the rust version of the merger app. This app will take three files:
-    - a barcodes CSV file with two columns sample and barcode.
-    - CSV of the the epi database from EpiInfo.
-    - MinKNOW report from the sequencing run. 
-
-    In the app, the user can fill in the lab info details that are common to the
-    whole run such as run number or pcr dates. The MinKNOW report will extract the
-    flowcell id, type, pores, seq kit, device type, runtime, and minknow version.
-    Then the app will glue all the info together with the EpiInfo and output a file
-    ready for Piranha.
-
 
     -TO add:
     - French version
@@ -78,22 +66,15 @@ fn read_csv_normalized(path: &str) -> Result<DataFrame, String> {
     let delim = detect_delimiter(path)
         .map_err(|e| format!("Failed to detect delimiter for '{}': {e}", path))?;
 
-    let mut content = std::fs::read_to_string(path)
+    let content = std::fs::read_to_string(path)
         .map_err(|e| format!("Failed to read file '{}': {e}", path))?;
-
-    if delim != b',' {
-        content = content.replace(',', ".");
-        let delim_ch = delim as char;
-        if delim_ch != ',' {
-            content = content.replace(delim_ch, ",");
-        }
-    }
 
     let mut lines = content.lines();
     let header_line = lines
         .next()
         .ok_or_else(|| format!("CSV file '{}' appears to be empty", path))?;
-    let headers: Vec<&str> = header_line.split(',').collect();
+    let delim_ch = delim as char;
+    let headers: Vec<&str> = header_line.split(delim_ch).collect();
 
     let fields: Vec<(PlSmallStr, DataType)> = headers
         .into_iter()
@@ -105,10 +86,20 @@ fn read_csv_normalized(path: &str) -> Result<DataFrame, String> {
 
     let options = CsvReadOptions::default()
         .with_has_header(true)
-        .with_schema(Some(schema_ref));
+        .with_schema(Some(schema_ref))
+        .map_parse_options(move |po| {
+            let po = po
+                .with_separator(delim)
+                .with_truncate_ragged_lines(true);
+
+            if delim == b';' {
+                po.with_decimal_comma(true)
+            } else {
+                po
+            }
+        });
 
     let cursor = std::io::Cursor::new(content.into_bytes());
-
     let reader = options.into_reader_with_file_handle(cursor);
 
     reader
@@ -405,7 +396,7 @@ fn main() {
                     }
                 }
 
-                // Read CSVs (normalized in memory, all columns as String)
+                // Read CSVs
                 let mut sample_df = match read_csv_normalized(&piranha_path) {
                     Ok(df) => df,
                     Err(msg) => {
@@ -435,9 +426,10 @@ fn main() {
                     if ui.get_mode().as_str() == "minION" {
                         let rename_pairs = [
                             ("DateFinalCellCultureResults", "DateFinalCultureResult"),
-                            ("DateFinalrRTPCRResults",     "DateFinalITDresult"),
-                            ("FinalITDResult",             "ITDResult"),
-                            ("SequenceName",               "SangerSequenceID"),
+                            ("DateFinalrRTPCRResults", "DateFinalITDresult"),
+                            ("FinalITDResult", "ITDResult"),
+                            ("SequenceName", "SangerSequenceID"),
+                            ("DateSeqResult", "DateSangerResultGenerated")
                         ];
 
                         for (old, new_) in rename_pairs {
@@ -454,7 +446,6 @@ fn main() {
                         }
                     }
 
-                    // Drop overlapping columns to avoid name collision
                     let sample_cols: std::collections::HashSet<String> =
                         sample_df.get_column_names().iter().map(|&s| s.to_string()).collect();
                     let epi_cols: std::collections::HashSet<String> =
@@ -519,7 +510,7 @@ fn main() {
                 let expected_minion = [
                     "sample","barcode","IsQCRetest","IfRetestOriginalRun","institute","EPID","CaseOrContact","CountryOfSampleOrigin",
                     "SpecimenNumber","DateOfOnset","DateStoolCollected","DateStoolReceivedinLab","DateStoolsuspension",
-                    "TypeofPositiveControl","DatePositiveControlreconstituted","DateFinalCultureResult","FlaskNumber",
+                    "DateFinalCultureResult","FlaskNumber",
                     "FinalCellCultureResult","DateFinalITDresult","ITDResult","ITDMixture","DateSangerResultGenerated",
                     "SangerSequenceID","SequencingLab","DelaysInProcessingForSequencing","DetailsOfDelays","IsclassificationQCRetest",
                     "RTPCRcomments","DateRNAExtraction","DateRTPCR","PositiveControlPCRCheck","NegativeControlPCRheck",
