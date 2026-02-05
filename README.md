@@ -1,7 +1,7 @@
 # Merger App
 
 ## Installation
-The compiled executable can be found in the **releases** page. Note that the app is currently **Windows only**.
+The compiled executables can be found in the **releases** page.
 
 ## Usage
 
