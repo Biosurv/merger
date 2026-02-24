@@ -1,7 +1,7 @@
 # Merger App
 
 ## Installation
-The compiled executables can be found in the **releases** page.
+The compiled executables for Windows, Linux and MacOS (Intel and Silicon) can be found in the **releases** page.
 
 ## Usage
 
