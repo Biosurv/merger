@@ -1,8 +1,7 @@
 use polars::prelude::*;
 use std::collections::HashMap;
 
-/// Converts a well ID (like "A1", "B12") to a 0-based index (0-95 for a 96-well plate)
-/// A1=0, A2=1, ..., A12=11, B1=12, ..., H12=95
+/// Converts a well ID to a 0-based index (0-95 for a 96-well plate)
 pub fn well_to_index(well: &str) -> Option<usize> {
     let well = well.trim();
     if well.len() < 2 {
@@ -32,7 +31,7 @@ pub fn well_to_index(well: &str) -> Option<usize> {
     Some(row * 12 + (col - 1))
 }
 
-/// Converts a 0-based index to a well ID
+// converts a 0-based index to a well ID
 pub fn index_to_well(idx: usize) -> Option<String> {
     if idx >= 96 {
         return None;
@@ -43,22 +42,14 @@ pub fn index_to_well(idx: usize) -> Option<String> {
     Some(format!("{}{}", row_char, col))
 }
 
-/// Converts a well ID to a barcode string (e.g., "A1" -> "barcode01")
+// converts a well ID to a barcode string
 pub fn well_to_barcode(well: &str) -> Option<String> {
     let idx = well_to_index(well)?;
     Some(format!("barcode{:02}", idx + 1))
 }
 
-/// Applies plate map entries to a DataFrame by ADDING new rows.
-///
-/// The plate_entries map is keyed by well ID (e.g., "A1") with values of (sample, barcode).
-///
-/// For each entry, a new row is added with:
-/// - sample column = the sample value
-/// - barcode column = the barcode value
-/// - Well column (if it exists) = the well ID
-///
-/// Returns the updated DataFrame with new rows appended.
+// Applies plate map entries to a DataFrame by ADDING new rows
+// returns the updated DataFrame with new rows appended
 pub fn apply_plate_map_to_dataframe(
     df: DataFrame,
     plate_entries: &HashMap<String, (String, String)>,
@@ -79,7 +70,7 @@ pub fn apply_plate_map_to_dataframe(
     println!("[plate_map] DataFrame columns: {:?}", column_names);
     println!("[plate_map] Original DataFrame height: {}", df.height());
 
-    // Sort entries by barcode for consistent ordering (barcode01, barcode02, ...)
+    // Sort entries by barcode for consistent ordering
     let mut sorted_entries: Vec<(&String, &(String, String))> = plate_entries.iter().collect();
     sorted_entries.sort_by(|a, b| {
         let barcode_a = &(a.1).1;
@@ -87,7 +78,7 @@ pub fn apply_plate_map_to_dataframe(
         barcode_a.cmp(barcode_b)
     });
 
-    // Build new rows - one for each plate entry
+    // Build new rows
     let num_new_rows = sorted_entries.len();
 
     // Create vectors for each column
@@ -129,7 +120,6 @@ pub fn apply_plate_map_to_dataframe(
     println!("[plate_map] New rows DataFrame height: {}", new_df.height());
 
     // Concatenate the original DataFrame with the new rows
-    // If the original df is empty (just headers), we just use the new df
     let result = if df.height() == 0 {
         println!("[plate_map] Original DataFrame empty, using new rows only");
         new_df

@@ -91,7 +91,7 @@ pub fn read_csv_normalized(path: &str) -> Result<(DataFrame, u8), String> {
     Ok((df, delim))
 }
 
-/// French-to-English month abbreviation pairs (lowercase French -> English)
+/// French to english month pairs
 const FRENCH_MONTHS: &[(&str, &str)] = &[
     ("janv", "Jan"),
     ("jan", "Jan"),
@@ -114,8 +114,7 @@ const FRENCH_MONTHS: &[(&str, &str)] = &[
     ("dec", "Dec"),
 ];
 
-/// Translates French month abbreviations to English in all string columns.
-/// Handles date formats like "11-Fév-26" -> "11-Feb-26".
+// Translates months
 fn translate_french_months(df: DataFrame) -> Result<DataFrame, PolarsError> {
     let mut df = df;
     let col_names: Vec<String> = df.get_column_names().iter().map(|s| s.to_string()).collect();
@@ -139,8 +138,6 @@ fn translate_french_months(df: DataFrame) -> Result<DataFrame, PolarsError> {
     Ok(df)
 }
 
-/// Replaces French month abbreviations with English equivalents in a single value.
-/// Looks for patterns like "-Fév-" or "-Août-" within date strings.
 fn translate_french_month_in_value(val: &str) -> String {
     // Split on common date separators to find month parts
     for sep in &["-", "/", " "] {
@@ -169,20 +166,19 @@ fn translate_french_month_in_value(val: &str) -> String {
     val.to_string()
 }
 
-/// Result of checking sample/barcode columns
 #[derive(Debug)]
 pub enum SampleBarcodeStatus {
-    /// All rows have both sample and barcode filled
+    // All rows have both sample and barcode filled
     Complete,
-    /// No rows have any sample or barcode data (empty template)
+    // No rows have any sample or barcode data
     Empty,
-    /// Some rows have data, but some are incomplete
+    // Some rows have data
     Incomplete { missing_rows: Vec<usize> },
 }
 
 /// Checks the status of sample and barcode columns in the DataFrame
 pub fn check_sample_barcode_status(df: &DataFrame) -> PolarsResult<SampleBarcodeStatus> {
-    // If no rows, it's empty
+
     if df.height() == 0 {
         return Ok(SampleBarcodeStatus::Empty);
     }
@@ -210,7 +206,7 @@ pub fn check_sample_barcode_status(df: &DataFrame) -> PolarsResult<SampleBarcode
         }
 
         if sample_empty || barcode_empty {
-            missing_rows.push(idx + 1); // 1-indexed for user display
+            missing_rows.push(idx + 1); // 1 indexed for user display
         }
     }
 

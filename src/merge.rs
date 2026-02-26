@@ -4,10 +4,10 @@ use std::collections::HashSet;
 
 use crate::template::expected_columns_for_mode;
 
-/// Input parameters for a merge operation
+/// Input parameters for a merge op
 pub struct MergeParams {
     pub mode: String,
-    pub action: String,  // "merge" or "update"
+    pub action: String, 
     pub overwrite_existing: bool,
     pub run_num: String,
     pub minknow_ver: Option<String>,
@@ -31,7 +31,7 @@ pub struct MergeParams {
     pub vp1_primers: String,
 }
 
-/// Validates date format (yyyy-mm-dd)
+/// Validates date format
 pub fn validate_date(val: &str, name: &str) -> Option<String> {
     let date_regex = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
     if !val.is_empty() && !date_regex.is_match(val) {
@@ -41,7 +41,7 @@ pub fn validate_date(val: &str, name: &str) -> Option<String> {
     }
 }
 
-/// Validates run number format (yyyymmdd_xxx)
+/// Validates run number format
 pub fn validate_run_number(run_num: &str) -> Option<String> {
     let run_num_regex = Regex::new(r"^\d{8}_\d{3}$").unwrap();
     if !run_num.is_empty() && !run_num_regex.is_match(run_num) {
@@ -76,7 +76,7 @@ pub fn rename_epiinfo_columns_for_minion(epi_df: &mut DataFrame) -> Result<(), S
     Ok(())
 }
 
-/// Merges sample_df with epi_df
+// Merges sample_df with epi_df
 pub fn merge_with_epiinfo(
     sample_df: DataFrame,
     epi_df: DataFrame,
@@ -141,7 +141,7 @@ pub fn validate_columns(df: &DataFrame, mode: &str) -> Result<(), String> {
     }
 }
 
-/// Converts PCR control selection to Pass/Fail string
+// Converts PCR control selection to Pass/Fail string
 pub fn pcr_control_value(selection: &str) -> &'static str {
     match selection {
         "Positive Passed" | "Negative Passed" => "Pass",
@@ -151,7 +151,7 @@ pub fn pcr_control_value(selection: &str) -> &'static str {
     }
 }
 
-/// Helper to fill a column if it's null or empty string
+// Helper to fill a column if it's null or empty string
 fn fill_if_empty(column: &str, value: &str) -> Expr {
     when(col(column).is_null().or(col(column).eq(lit(""))))
         .then(lit(value))
@@ -159,10 +159,7 @@ fn fill_if_empty(column: &str, value: &str) -> Expr {
         .alias(column)
 }
 
-/// Conditionally fills a column based on overwrite setting and value
-/// - If overwrite is false, returns column as-is
-/// - If value is empty, returns column as-is
-/// - Otherwise, applies fill_if_empty logic
+// Conditionally fills a column based on overwrite setting and value
 fn conditional_fill(column: &str, value: &str, overwrite: bool) -> Expr {
     if !overwrite || value.is_empty() {
         col(column).alias(column)
@@ -171,7 +168,7 @@ fn conditional_fill(column: &str, value: &str, overwrite: bool) -> Expr {
     }
 }
 
-/// Fills run constants into the merged DataFrame
+// Fills run constants into the merged DataFrame
 pub fn fill_run_constants(
     merged_df: DataFrame,
     params: &MergeParams,
@@ -251,14 +248,14 @@ pub fn fill_run_constants(
         .map_err(|e| format!("Failed to fill run constants: {:?}", e))
 }
 
-/// Selects only the expected columns for the mode
+// Selects only the expected columns for the mode
 pub fn select_expected_columns(df: DataFrame, mode: &str) -> Result<DataFrame, String> {
     let expected_columns = expected_columns_for_mode(mode);
     df.select(expected_columns)
         .map_err(|e| format!("Failed to select expected columns: {:?}", e))
 }
 
-/// Validates input formats for merge operation
+// Validates input formats for merge operation
 pub fn validate_merge_inputs(params: &MergeParams) -> Result<(), String> {
     let mut errors = Vec::new();
 
