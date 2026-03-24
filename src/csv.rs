@@ -3,12 +3,12 @@ use polars::prelude::NullValues;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::sync::Arc;
+use unicode_normalization::UnicodeNormalization;
 
 pub fn detect_delimiter(path: &str) -> io::Result<u8> {
     let file = File::open(path)?;
     let mut reader = BufReader::new(file);
 
-    // Only read the header line to avoid counting decimal commas as delimiters
     let mut header = String::new();
     if reader.read_line(&mut header)? == 0 {
         // Empty file, default to comma
@@ -19,7 +19,6 @@ pub fn detect_delimiter(path: &str) -> io::Result<u8> {
     let mut semi = 0usize;
     let mut tab = 0usize;
 
-    // Count delimiters in the header line only
     for &b in header.as_bytes() {
         match b {
             b',' => comma += 1,
@@ -46,6 +45,8 @@ pub fn read_csv_normalized(path: &str) -> Result<(DataFrame, u8), String> {
 
     let content = std::fs::read_to_string(path)
         .map_err(|e| format!("Failed to read file '{}': {e}", path))?;
+
+    let content = content.strip_prefix('\u{FEFF}').unwrap_or(&content).to_string();
 
     let mut lines = content.lines();
     let header_line = lines
@@ -93,26 +94,36 @@ pub fn read_csv_normalized(path: &str) -> Result<(DataFrame, u8), String> {
 
 /// French to english month pairs
 const FRENCH_MONTHS: &[(&str, &str)] = &[
+    ("janvier", "Jan"),
     ("janv", "Jan"),
     ("jan", "Jan"),
-    ("fév", "Feb"),
+    ("fevrier", "Feb"),
     ("fevr", "Feb"),
     ("fev", "Feb"),
     ("mars", "Mar"),
     ("mar", "Mar"),
+    ("avril", "Apr"),
     ("avr", "Apr"),
     ("mai", "May"),
     ("juin", "Jun"),
+    ("juillet", "Jul"),
     ("juil", "Jul"),
-    ("août", "Aug"),
+    ("jul", "Jul"),
     ("aout", "Aug"),
+    ("septembre", "Sep"),
     ("sept", "Sep"),
     ("sep", "Sep"),
+    ("octobre", "Oct"),
     ("oct", "Oct"),
+    ("novembre", "Nov"),
     ("nov", "Nov"),
-    ("déc", "Dec"),
+    ("decembre", "Dec"),
     ("dec", "Dec"),
 ];
+
+fn strip_accents(s: &str) -> String {
+    s.nfd().filter(|c| !unicode_normalization::char::is_combining_mark(*c)).collect()
+}
 
 // Translates months
 fn translate_french_months(df: DataFrame) -> Result<DataFrame, PolarsError> {
@@ -139,17 +150,15 @@ fn translate_french_months(df: DataFrame) -> Result<DataFrame, PolarsError> {
 }
 
 fn translate_french_month_in_value(val: &str) -> String {
-    // Split on common date separators to find month parts
     for sep in &["-", "/", " "] {
         let parts: Vec<&str> = val.split(*sep).collect();
         if parts.len() >= 3 {
-            // Check each part for a French month
             let mut changed = false;
             let new_parts: Vec<String> = parts.iter().map(|part| {
-                let lower = part.to_lowercase();
-                // Try longest matches first (sorted by length desc in FRENCH_MONTHS)
+                let normalized = strip_accents(&part.to_lowercase());
+                let normalized = normalized.trim_end_matches('.');
                 for &(fr, en) in FRENCH_MONTHS {
-                    if lower == fr {
+                    if normalized == fr {
                         changed = true;
                         return en.to_string();
                     }
@@ -176,7 +185,7 @@ pub enum SampleBarcodeStatus {
     Incomplete { missing_rows: Vec<usize> },
 }
 
-/// Checks the status of sample and barcode columns in the DataFrame
+// Checks the status of sample and barcode
 pub fn check_sample_barcode_status(df: &DataFrame) -> PolarsResult<SampleBarcodeStatus> {
 
     if df.height() == 0 {
@@ -186,7 +195,6 @@ pub fn check_sample_barcode_status(df: &DataFrame) -> PolarsResult<SampleBarcode
     let has_sample_col = df.get_column_names().iter().any(|c| c.as_str() == "sample");
     let has_barcode_col = df.get_column_names().iter().any(|c| c.as_str() == "barcode");
 
-    // If columns don't exist, treat as empty
     if !has_sample_col || !has_barcode_col {
         return Ok(SampleBarcodeStatus::Empty);
     }
@@ -206,7 +214,7 @@ pub fn check_sample_barcode_status(df: &DataFrame) -> PolarsResult<SampleBarcode
         }
 
         if sample_empty || barcode_empty {
-            missing_rows.push(idx + 1); // 1 indexed for user display
+            missing_rows.push(idx + 1);
         }
     }
 

@@ -28,7 +28,7 @@ use crate::template::create_template_for_mode;
 use crate::types::PendingMerge;
 
 /*
-    Version: 1.2.0
+    Version: 1.2.1
     Date: 2026-02-11
     Authors: Matthew Anderson, Shean Mobed
 
